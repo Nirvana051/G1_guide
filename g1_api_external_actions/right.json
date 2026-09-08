@@ -1,0 +1,12 @@
+{
+  "action_id": "right",
+  "name": "right",
+  "frames": 125,
+  "dims": 14,
+  "frequency_hz": 30.0,
+  "velocity_limit": 20.0,
+  "size_bytes": 7128,
+  "created_unix": 1787569808.024031,
+  "description": "Waving to the right to introduce",
+  "duration_s": 4.17
+}

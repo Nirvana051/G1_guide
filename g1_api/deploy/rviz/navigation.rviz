@@ -1,0 +1,69 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Grid
+      Enabled: true
+      Name: Grid
+    - Class: rviz/Map
+      Enabled: true
+      Name: Map2D
+      Topic: /map_2d
+      Color Scheme: map
+    - Class: rviz/LaserScan
+      Enabled: true
+      Name: Scan
+      Topic: /scan
+      Color Transformer: FlatColor
+      Color: 255; 0; 0
+      Size (m): 0.05
+      Style: Points
+    - Class: rviz/PointCloud2
+      Enabled: true
+      Name: BodyCloud
+      Topic: /velodyne_points
+      Color Transformer: AxisColor
+      Axis: Z
+      Size (m): 0.02
+      Style: Points
+    - Class: rviz/TF
+      Enabled: true
+      Name: TF
+      Show Names: true
+      Frames:
+        All Enabled: false
+        map:
+          Value: true
+        body:
+          Value: true
+        base_link:
+          Value: true
+    - Class: rviz/Path
+      Enabled: true
+      Name: GlobalPlan
+      Topic: /move_base/GlobalPlanner/plan
+      Color: 0; 255; 0
+      Line Width: 0.05
+    - Class: rviz/Odometry
+      Enabled: true
+      Name: SlamOdom
+      Topic: /slam_odom
+      Keep: 1
+      Shaft Length: 0.5
+  Global Options:
+    Fixed Frame: map
+    Frame Rate: 30
+  Tools:
+    - Class: rviz/MoveCamera
+    - Class: rviz/SetGoal
+      Topic: /move_base_simple/goal
+  Views:
+    Current:
+      Class: rviz/TopDownOrtho
+      Name: Current View
+      Scale: 40
+Window Geometry:
+  Height: 900
+  Width: 1200

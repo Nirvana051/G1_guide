@@ -1,0 +1,124 @@
+TebLocalPlannerROS:
+
+ # Trajectory
+
+ teb_autosize: True
+ dt_ref: 0.3
+ dt_hysteresis: 0.1
+ max_samples: 500
+ global_plan_overwrite_orientation: True
+ allow_init_with_backwards_motion: False
+ max_global_plan_lookahead_dist: 10.0
+ global_plan_viapoint_sep: 0.5 # 0.2 的密集 via 点拉扯造成微修正抖动
+ global_plan_prune_distance: 0.3
+ exact_arc_length: False
+ feasibility_check_no_poses: 5
+ publish_feedback: False
+
+ # Robot
+
+ max_vel_x: 0.8              # 对齐速度桥限幅（桥 0.8），2.0 会让 TEB 时间模型失真
+ max_vel_x_backwards: 0.02   # 禁止倒退（身后目标必须转身）。不设精确 0 是因为 0 会让
+                             # 优化器退化（vx 钳 0、wz 输出很小→撞桥死区→锁定→转不动）；
+                             # 0.02 仅为数值稳定，且 < 桥 vx 死区 0.1，物理上一步不会倒
+ max_vel_y: 0.0
+ max_vel_theta: 0.8          # 对齐速度桥限幅（桥 0.8）
+ acc_lim_x: 0.6   # 双足现实加速度（轮式原值2.5，规划跟不上→蛇形修正）
+ acc_lim_theta: 1.2 # 同上，旋转加速度向步态低头
+ min_turning_radius: 0.0 # diff-drive robot (can turn on place!)
+
+ footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
+   type: "two_circles"
+   radius: 0.36 # for type "circular"
+   line_start: [0.0, 0.0] # for type "line"
+   line_end: [0.2, 0.0] # for type "line"
+   front_offset: 0.225 # for type "two_circles" - circumscribed circle center of the [0, 0.45] segment
+   front_radius: 0.273 # for type "two_circles" - circumscribed circle radius of the [0, 0.45] x [-0.155, 0.155] segment
+   rear_offset: 0.125 # for type "two_circles" - circumscribed circle center of the [-0.25, 0] segment
+   rear_radius: 0.199 # for type "two_circles" - circumscribed circle radius of the [-0.25, 0] x [-0.155, 0.155] segment
+   vertices: [[0.3, 0.2], [-0.1, 0.2], [-0.1, -0.2], [0.3, -0.2]] # for type "polygon"
+
+ # GoalTolerance
+
+ xy_goal_tolerance: 0.35
+ yaw_goal_tolerance: 6.28    # 分层到点：planner 只判位置（xy 进圈立即 SUCCEEDED），
+                             # 朝向由 g1_api 的旋转阶段完成（yaw_threshold，默认 0.5）。
+                             # 人形不适合终点耦合收位置+朝向（终点跳舞/定位滑移温床）
+ free_goal_vel: True         # 带速度进圈，不做减速到零的"爬行尾巴"——G1 行走控制
+                             # 器对 <0.15~0.2 m/s 的指令不迈步（死区），分层到点下
+                             # 由 g1_api 在宣告后发停，TEB 无需在终点刹停
+ complete_global_plan: False # True 时必须吃完全局路径的 via-point 才宣告到点，
+                             # 人在容差圈内也不报——"到点太严苛"的主要来源
+
+ # Obstacles
+
+ min_obstacle_dist: 0.3
+ inflation_dist: 0.6
+ include_costmap_obstacles: True
+ costmap_obstacles_behind_robot_dist: 1.5
+ obstacle_poses_affected: 15
+
+ dynamic_obstacle_inflation_dist: 0.6
+ include_dynamic_obstacles: True
+
+ costmap_converter_plugin: ""
+ costmap_converter_spin_thread: True
+ costmap_converter_rate: 5
+
+ # Optimization
+
+ no_inner_iterations: 4
+ no_outer_iterations: 3
+ optimization_activate: True
+ optimization_verbose: False
+ penalty_epsilon: 0.03
+ obstacle_cost_exponent: 4
+ weight_max_vel_x: 2
+ weight_max_vel_theta: 1
+ weight_acc_lim_x: 1
+ weight_acc_lim_theta: 1
+ weight_kinematics_nh: 1000
+ weight_kinematics_forward_drive: 1000 # 前进硬偏好：身后目标转身而不是倒退
+ weight_kinematics_turning_radius: 1
+ weight_optimaltime: 4 # must be > 0; 调高让 TEB 保持巡航、晚减速——中途(如贴近障碍
+                       # 或窄道)速度也不容易掉进行走死区，原值 1 偏"肉"
+ weight_shortest_path: 0
+ weight_obstacle: 100
+ weight_inflation: 0.2
+ weight_dynamic_obstacle: 2
+ weight_dynamic_obstacle_inflation: 0.1
+ weight_viapoint: 5     # 贴全局路径松一点，直线更稳
+ weight_adapt_factor: 2
+
+ # Homotopy Class Planner
+
+ enable_homotopy_class_planning: False
+ enable_multithreading: True
+ max_number_classes: 4
+ selection_cost_hysteresis: 1.0
+ selection_prefer_initial_plan: 0.9
+ selection_obst_cost_scale: 100.0
+ selection_alternative_time_cost: False
+
+ roadmap_graph_no_samples: 15
+ roadmap_graph_area_width: 5
+ roadmap_graph_area_length_scale: 1.0
+ h_signature_prescaler: 0.5
+ h_signature_threshold: 0.1
+ obstacle_heading_threshold: 0.45
+ switching_blocking_period: 0.0
+ viapoints_all_candidates: True
+ delete_detours_backwards: True
+ max_ratio_detours_duration_best_duration: 3.0
+ visualize_hc_graph: False
+ visualize_with_time_as_z_axis_scale: False
+
+ # Recovery
+
+ shrink_horizon_backup: True
+ shrink_horizon_min_duration: 10
+ oscillation_recovery: True
+ oscillation_v_eps: 0.1
+ oscillation_omega_eps: 0.1
+ oscillation_recovery_min_duration: 10
+ oscillation_filter_duration: 10

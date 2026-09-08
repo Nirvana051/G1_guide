@@ -1,0 +1,94 @@
+<!-- Parameterized navigation launch for g1_api (the course navigation.launch
+     hard-codes three map paths; this copy turns them into <arg>s so :select can
+     restart roslaunch against a chosen map directory without editing files).
+
+     Usage: roslaunch g1_api_navigation.launch \
+                pcd_path:=/path/to/map.pcd \
+                ground_pcd_path:=/path/to/ground_map.pcd \
+                grid_yaml:=/path/to/mymap.yaml
+
+     NB: this layer's 2D-map arg is named grid_yaml because a leading digit
+     ("2dmap_file:=...") parses as a topic remapping on the roslaunch command
+     line and the arg silently keeps its default; it is forwarded to the course
+     launch's 2dmap_file XML-side, where digit-leading arg names are fine.
+-->
+<launch>
+    <arg name="pcd_path" default="/home/unitree/abotclaw_nv/navigate/map/map.pcd" />
+    <arg name="ground_pcd_path" default="/home/unitree/abotclaw_nv/navigate/map/ground_map.pcd" />
+    <arg name="grid_yaml" default="/home/unitree/abotclaw_nv/navigate/map/mymap.yaml" />
+    <arg name="rviz" default="false" />
+    <!-- /scan 高度切片下限（base_link=雷达系）。雷达离地 H≈1.15m 时 -0.85 即
+         离地 0.30m 以下不进 /scan；余量 = H − |值|，给走路俯仰留 ≥0.2m。
+         课程原值 -1 余量仅 0.1~0.2m，迈步俯仰时地面会闪进代价地图。 -->
+    <arg name="scan_min_height" default="-0.85" />
+
+    <node pkg="tf" type="static_transform_publisher" name="base_to_body"
+          args="0.0 0 0.0 3.1416 3.1416 0 /body /base_link 1" />
+
+    <include file="$(find livox_ros_driver2)/launch_ROS1/msg_MID360.launch">
+    </include>
+
+    <rosparam command="load" file="$(find fastlio)/config/localize.yaml" />
+    <node pkg="fastlio" type="localizer_node" name="localizer_node" output="screen"/>
+
+    <node pkg="fastlio" type="slam_reloc.py" name="slam_reloc" output="screen">
+        <param name="pcd_path" value="$(arg pcd_path)" />
+    </node>
+
+    <include file="$(find fastlio)/launch/gridmap_load.launch">
+        <arg name="rviz" value="$(arg rviz)"/>
+        <arg name="2dmap_file" value="$(arg grid_yaml)"/>
+    </include>
+
+    <include file="$(find tool)/launch/downsample_pointcloud.launch">
+        <arg name="pcd_file" value="$(arg ground_pcd_path)"/>
+    </include>
+
+    <node pkg="tf" type="static_transform_publisher" name="slam_odom_to_odom"
+          args="0 0 0 0 0 0 /slam_odom /odom 100" />
+
+    <include file="$(find xju_pnc)/launch/move_base.launch">
+        <arg name="pnc_rviz" value="false"/>
+    </include>
+
+    <!-- TEB 终点段放松（覆盖课程默认，课程文件不动）。原理：g1_api 的三阶段到点
+         （粗到点→旋转对准→XY精调）负责精度，TEB 只负责快速接近；goal 的 yaw 是
+         占位的 0，让 TEB 忽略朝向；速度上限对齐速度桥限幅(0.5/0.2/0.7)，
+         课程原值 3.0 使 TEB 的时间模型失真。想回课程行为传参覆盖即可。 -->
+    <!-- 终点段容差 = 课程原值（xy 0.2 / yaw 0.3 / 刹停 / 走完全局路径）。
+         调整时谨记不变量：teb_xy_goal_tolerance 必须 ≤ MoveTo 的 reach_threshold
+         (默认0.35)，否则 TEB 提前"宣布完成"停车而 g1_api 粗到点判定等不到，
+         死锁到超时（仿真实测：0.35 时 80s 不到点）。 -->
+    <arg name="teb_xy_goal_tolerance" default="0.2"/>
+    <arg name="teb_yaw_goal_tolerance" default="0.3"/>
+    <arg name="teb_free_goal_vel" default="false"/>
+    <arg name="teb_max_vel_x" default="0.5"/>
+    <arg name="teb_max_vel_y" default="0.2"/>
+    <arg name="teb_max_vel_theta" default="0.7"/>
+    <param name="/move_base/TebLocalPlannerROS/xy_goal_tolerance" value="$(arg teb_xy_goal_tolerance)"/>
+    <param name="/move_base/TebLocalPlannerROS/yaw_goal_tolerance" value="$(arg teb_yaw_goal_tolerance)"/>
+    <param name="/move_base/TebLocalPlannerROS/free_goal_vel" value="$(arg teb_free_goal_vel)"/>
+    <param name="/move_base/TebLocalPlannerROS/max_vel_x" value="$(arg teb_max_vel_x)"/>
+    <param name="/move_base/TebLocalPlannerROS/max_vel_y" value="$(arg teb_max_vel_y)"/>
+    <param name="/move_base/TebLocalPlannerROS/max_vel_theta" value="$(arg teb_max_vel_theta)"/>
+
+    <!-- point_to_scan 内联（替代课程 include，课程文件不动），仅 min_height 参数化，
+         其余参数与课程 point_to_scan.launch 逐字一致。 -->
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+        <remap from="cloud_in" to="/base_link_cloud"/>
+        <param name="transform_tolerance" value="0.01" />
+        <param name="min_height" value="$(arg scan_min_height)" />
+        <param name="max_height" value="0.15" />
+        <param name="angle_min" value="-3.1425926" />
+        <param name="angle_max" value="3.1415926" />
+        <param name="angle_increment" value="0.007" />
+        <param name="scan_time" value="0.1" />
+        <param name="range_min" value="0.2" />
+        <param name="range_max" value="100" />
+        <param name="use_inf" value="true" />
+        <param name="inf_epsilon" value="1.0" />
+        <param name="concurrency_level" value="1" />
+    </node>
+    <include file="$(find tool)/launch/body2any_pointcloud.launch" />
+    <include file="$(find velocity_smoother_ema)/launch/velocity_smoother_ema.launch" />
+</launch>

@@ -1,0 +1,12 @@
+{
+  "action_id": "tour04_fit",
+  "name": "tour04_fit",
+  "frames": 200,
+  "dims": 14,
+  "frequency_hz": 25.0,
+  "velocity_limit": 20.0,
+  "size_bytes": 11328,
+  "created_unix": 1787980297.1005797,
+  "description": "",
+  "duration_s": 8.0
+}

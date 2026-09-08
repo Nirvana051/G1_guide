@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "g1_api"
+version = "0.1.0"
+description = "Slamtec-style core API + SDK debug console + tour application for the Unitree G1 humanoid robot"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "fastapi>=0.110",
+    "pydantic>=2.6",
+    "uvicorn>=0.27",
+    "PyYAML>=5.4",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7",
+    "httpx>=0.26",
+]
+
+[tool.setuptools.packages.find]
+include = ["g1_api*"]
+
+[tool.setuptools.package-data]
+"g1_api.console" = ["static/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

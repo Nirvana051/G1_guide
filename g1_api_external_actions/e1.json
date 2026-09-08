@@ -1,0 +1,12 @@
+{
+  "action_id": "e1",
+  "name": "e1",
+  "frames": 390,
+  "dims": 14,
+  "frequency_hz": 30.0,
+  "velocity_limit": 20.0,
+  "size_bytes": 21968,
+  "created_unix": 1787480936.356031,
+  "description": "",
+  "duration_s": 13.0
+}

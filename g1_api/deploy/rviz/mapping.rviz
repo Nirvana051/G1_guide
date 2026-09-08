@@ -1,0 +1,45 @@
+Panels:
+  - Class: rviz/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz/Grid
+      Enabled: true
+      Name: Grid
+    - Class: rviz/PointCloud2
+      Enabled: true
+      Name: BodyCloud
+      Topic: /body_cloud
+      Color Transformer: AxisColor
+      Axis: Z
+      Size (m): 0.02
+      Style: Points
+    - Class: rviz/Map
+      Enabled: true
+      Name: ProjectedMap
+      Topic: /projected_map
+      Color Scheme: map
+    - Class: rviz/TF
+      Enabled: true
+      Name: TF
+      Show Names: true
+      Frames:
+        All Enabled: false
+        local:
+          Value: true
+        body:
+          Value: true
+  Global Options:
+    Fixed Frame: local
+    Frame Rate: 30
+  Tools:
+    - Class: rviz/MoveCamera
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Name: Current View
+      Distance: 18
+Window Geometry:
+  Height: 900
+  Width: 1200

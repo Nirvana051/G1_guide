@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="OUTPUT_METHOD" default="screen"/>
+    <arg name="RESPAWN" default="false"/>
+    <arg name="map_yaml_path" default="$(find robot_settings)/maps/delta/SSNS/SSNS1.yaml"/>
+    <!-- Unused while the nodes-based path boundary / nodes visualizer are disabled.
+    <arg name="nodes_json_path" default="$(find robot_settings)/paths/nodes.json"/>
+    <arg name="points_2d" default="[[8.3, -10.2], [-1.5, 6.34]]"/>
+    -->
+
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_yaml_path)" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)"/>
+    <node pkg="tf" type="static_transform_publisher" name="odom_to_map" args="0 0 0 0 0 0  /map /odom 100" />
+
+    <!-- Nodes visualization is disabled along with the nodes-based path boundary for TEB.
+    <node pkg="robot_settings" type="visualize_nodes.py" name="nodes_visualizer" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <param name="frame_id" value="map"/>
+        <param name="nodes_file" value="$(arg nodes_json_path)"/>
+        <param name="marker_topic" value="nodes_markers"/>
+        <rosparam param="points_2d" subst_value="true">$(arg points_2d)</rosparam>
+        <param name="closed_loop" value="false"/>
+        <param name="use_json_fallback" value="false"/>
+        <param name="publish_rate" value="2.0"/>
+        <param name="point_scale" value="1.2"/>
+        <param name="text_scale" value="1.8"/>
+        <param name="arrow_length" value="2.0"/>
+        <param name="arrow_width" value="0.28"/>
+        <param name="line_width" value="0.18"/>
+        <param name="z_offset" value="0.4"/>
+        <param name="text_yaw_offset" value="0.0"/>
+        <param name="show_origin_marker" value="true"/>
+        <param name="origin_marker_scale" value="2.0"/>
+        <param name="show_center_marker" value="true"/>
+        <param name="center_marker_scale" value="2.2"/>
+    </node>
+    -->
+
+    <!-- Path boundary generation via nodes/points_2d is disabled for TEB.
+    <node pkg="robot_settings" type="publish_interpolated_path.py" name="path_boundry_path_publisher" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <param name="frame_id" value="map"/>
+        <param name="path_topic" value="/path_boundry_path"/>
+        <param name="interp_step" value="0.2"/>
+        <param name="publish_rate" value="2.0"/>
+        <rosparam param="points_2d" subst_value="true">$(arg points_2d)</rosparam>
+    </node>
+    -->
+
+    <node pkg="move_base" type="move_base" name="move_base" respawn="$(arg RESPAWN)" output="$(arg OUTPUT_METHOD)">
+        <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+        <rosparam file="$(find robot_settings)/cfg/G1/move_base_params.yaml" command="load"/>
+        <rosparam file="$(find robot_settings)/cfg/G1/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find robot_settings)/cfg/G1/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find robot_settings)/cfg/G1/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_settings)/cfg/G1/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_settings)/cfg/G1/teb_local_planner_params.yaml" command="load" />
+    </node>
+
+</launch>

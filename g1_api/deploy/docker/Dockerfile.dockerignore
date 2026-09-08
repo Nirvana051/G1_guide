@@ -1,0 +1,11 @@
+# BuildKit 会优先使用 <Dockerfile 名>.dockerignore（与 Dockerfile 同目录），
+# 无需在项目根目录放 .dockerignore。
+.git
+**/__pycache__
+**/*.pyc
+**/*.pyo
+.pytest_cache
+tests
+docs
+tools
+deploy

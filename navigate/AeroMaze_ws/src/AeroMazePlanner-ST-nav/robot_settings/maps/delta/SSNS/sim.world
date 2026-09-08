@@ -1,0 +1,94 @@
+
+# set the resolution of the underlying raytrace model in meters
+resolution 0.03
+interval_sim 20  # simulation timestep in milliseconds
+
+define block model
+(
+  # size [0.3 0.3 0.3]
+  gui_nose 0
+)
+
+define topurg ranger
+(
+  sensor( 			
+    range [ 0.0  5.0 ]
+    fov 180
+    samples 1000
+  )
+
+
+  # generic model properties
+  color "black"
+  size [ 0.005 0.005 0.005 ]
+  update_interval 40
+)
+
+
+
+define erratic position
+(
+  size [0.7 0.31 0.300]
+  origin [-0.10 0.000 0.000 0.000]
+  # 这里要先确定狗的最大速度
+  velocity_bounds [-1 1 -1 1 0 0 -51.56 51.56 ]
+  acceleration_bounds [-1.1 1.1 0 0 0 0 -103.13 103.13]
+  odom_error [0.1 0.2 0.0 0.04]
+  gui_nose 1
+  obstacle_return 1
+  ranger_return 1.000
+  drive "omni"
+  topurg(pose [ 0.180 0.000 -0.100 0.000 ])
+  update_interval 40
+)
+
+define floorplan model
+(
+  # sombre, sensible, artistic
+  color "gray30"
+
+  # most maps will need a bounding box
+  boundary 1
+
+  gui_nose 0
+  gui_grid 0
+
+  gui_outline 0
+  gui_move 0
+  gripper_return 0
+  fiducial_return 0
+  ranger_return 1.000
+)
+
+window
+( 
+  size [ 807 523 ] 
+  rotate [ 0.000 406.500 ]
+  scale 54.764 
+)
+
+# load an environment bitmap
+floorplan
+( 
+  name "map"
+
+  #bitmap "keenon_fixed.pgm"
+  #size [50.400 57.600 1.000]
+
+  bitmap "SSNS1.pgm"
+  size [179.800 448.200 1.000]
+
+  pose [-57.300 -177.700 0.000 0.000 ]
+)
+
+# throw in a robot  #initial position
+erratic( pose [ 3.893 -2.672  0.000 110.764 ] name "era" color "blue")
+
+block( size [1.000 1.000 1.000] pose [ -1.400 -5.967 0.000 -109.801 ] name "obc1" color "black")
+block( size [0.400 0.400 1.000] pose [ -2.863 2.955 0.000 0.000 ] name "obc2" color "black")
+block( size [0.200 1.200 1.000] pose [ -1.863 -5.113 0.000 116.543 ] name "obc3" color "orange")
+block( size [0.200 1.200 1.000] pose [ -2.097 49.924 0.000 91.673 ] name "obc4" color "orange")
+block( size [0.200 1.200 1.000] pose [ -16.950 31.840 0.000 0.000 ] name "obc5" color "orange")
+block( size [0.200 1.200 1.000] pose [ -17.872 13.722 0.000 117.456 ] name "obc6" color "orange")
+
+# color:green, red, yellow, pink, purple, black, blue, orange, violet, brown

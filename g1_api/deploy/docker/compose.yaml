@@ -1,0 +1,28 @@
+# 用法（在本目录执行）：docker compose up -d
+# 服务映射到宿主机 1449（1448 通常被本机开发实例占用）。
+services:
+  g1-api:
+    image: g1-api:dev
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    container_name: g1-api
+    ports:
+      - "1449:1448"
+    restart: unless-stopped
+    environment:
+      # 默认安全姿态：mock 模式 + 所有安全开关关闭（写类请求一律 409 SAFETY_INTERLOCK）。
+      G1_API_MODE: mock
+
+      # ---- 安全开关示例（默认全部 false，按需取消注释；true 后该类请求可真正执行）----
+      # G1_API_SAFETY_ALLOW_MOTION: "true"        # MoveAction（遥操作，无避障）
+      # G1_API_SAFETY_ALLOW_NAVIGATION: "true"    # MoveTo / Rotate / RotateTo
+      # G1_API_SAFETY_ALLOW_MAP_WRITE: "true"     # 地图上传 / 选择 / 删除
+      # G1_API_SAFETY_ALLOW_ARM: "true"           # 手臂动作
+      # G1_API_SAFETY_ALLOW_HAND: "true"          # 灵巧手
+      # G1_API_SAFETY_ALLOW_VOICE: "true"         # TTS / 音量 / LED
+      # G1_API_SAFETY_ALLOW_TOUR: "true"          # 导览编排
+
+      # ---- 真机模式示例（危险！命令会到达真实硬件，务必先读 docs/DEPLOY_PC2.md）----
+      # G1_API_MODE: real
+      # G1_API_MODE_NETWORK_INTERFACE: eth0       # real 模式必填，无默认值

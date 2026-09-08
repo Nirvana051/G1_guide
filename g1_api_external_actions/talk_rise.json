@@ -1,0 +1,12 @@
+{
+  "action_id": "talk_rise",
+  "name": "talk_rise",
+  "frames": 140,
+  "dims": 14,
+  "frequency_hz": 20.0,
+  "velocity_limit": 20.0,
+  "size_bytes": 7968,
+  "created_unix": 1787896615.8669584,
+  "description": "",
+  "duration_s": 7.0
+}

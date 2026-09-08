@@ -1,0 +1,43 @@
+# g1_api default configuration.
+# Precedence: built-in defaults < this file < G1_API_<SECTION>_<FIELD> env vars.
+# Default posture: mock adapter, every ALLOW_* flag FALSE (cannot move a robot).
+
+server:
+  host: 127.0.0.1
+  port: 1448
+
+mode:
+  mode: mock            # mock | real
+  # network_interface: eth0   # required for real mode; NO default (see DEPLOY_PC2.md)
+
+safety:
+  allow_motion: false
+  allow_navigation: false
+  allow_map_write: false
+  allow_arm: false
+  allow_hand: false
+  allow_voice: false
+  allow_tour: false
+
+identity:
+  manufacturer_name: Unitree
+  model_name: G1
+  software_version: 0.1.0
+
+map:
+  map_storage_dir: ~/.g1_api/maps
+
+voice:
+  char_duration_s: 0.195
+
+hand:
+  robot_ip: null        # real mode: 192.168.123.164
+  port: 5678
+
+tour:
+  arm_release_action_id: 99
+  arm_release_wait_s: 3.0
+
+logging:
+  level: INFO
+  json_logs: false

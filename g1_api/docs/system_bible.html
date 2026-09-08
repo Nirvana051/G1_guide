@@ -1,0 +1,472 @@
+<title>G1 系统全书</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --bg: #F4F5FA; --surface: #FFFFFF; --surface-2: #E9EBF4;
+    --ink: #1B2030; --muted: #5B6275; --line: #D6DAE8;
+    --accent: #4756C8; --accent-ink: #32409E;
+    --code-bg: #171B2E; --code-ink: #D9DDEC; --code-accent: #8FA0FF; --code-cm: #6B7395;
+    --warn-bg: #FBF3E0; --warn-line: #E3C46E; --warn-ink: #7A5A10;
+    --danger: #A6402C; --danger-bg: #F9ECE8;
+    --ok: #2E7D4F; --ok-bg: #E9F2EA;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12141E; --surface: #191C2A; --surface-2: #212536;
+      --ink: #E4E6F0; --muted: #979EB6; --line: #303650;
+      --accent: #8B9AFF; --accent-ink: #A9B5FF;
+      --code-bg: #0D0F1A; --code-ink: #C9CEE2; --code-accent: #8FA0FF; --code-cm: #666E90;
+      --warn-bg: #2A2413; --warn-line: #6E5A1E; --warn-ink: #E0C36A;
+      --danger: #E08A73; --danger-bg: #33201A;
+      --ok: #6FBF8E; --ok-bg: #182A1E;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12141E; --surface: #191C2A; --surface-2: #212536;
+    --ink: #E4E6F0; --muted: #979EB6; --line: #303650;
+    --accent: #8B9AFF; --accent-ink: #A9B5FF;
+    --code-bg: #0D0F1A; --code-ink: #C9CEE2; --code-accent: #8FA0FF; --code-cm: #666E90;
+    --warn-bg: #2A2413; --warn-line: #6E5A1E; --warn-ink: #E0C36A;
+    --danger: #E08A73; --danger-bg: #33201A;
+    --ok: #6FBF8E; --ok-bg: #182A1E;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Noto Sans SC', 'IBM Plex Sans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: 15.5px; line-height: 1.75; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 46px 24px 100px; }
+  header.masthead { border-bottom: 3px solid var(--accent); padding-bottom: 26px; margin-bottom: 34px; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  h1 { font-size: 40px; font-weight: 700; margin: 8px 0 10px; text-wrap: balance; }
+  .lede { color: var(--muted); max-width: 46em; margin: 0; }
+  section { margin-top: 56px; }
+  h2 { font-size: 24px; font-weight: 700; margin: 0 0 6px; display: flex; align-items: baseline; gap: 12px; text-wrap: balance; }
+  h2 .no { font-family: 'IBM Plex Mono', monospace; font-size: 15px; color: var(--accent); font-weight: 600; }
+  .h2-sub { color: var(--muted); margin: 0 0 18px; max-width: 48em; }
+  h3 { font-size: 17px; font-weight: 700; margin: 26px 0 8px; }
+  h4 { font-size: 15px; font-weight: 700; margin: 18px 0 6px; }
+  .code { position: relative; background: var(--code-bg); color: var(--code-ink);
+    border-radius: 8px; margin: 12px 0; overflow: hidden; }
+  .code pre { margin: 0; padding: 13px 16px; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.62; }
+  .code .cm { color: var(--code-cm); }
+  .code .hl { color: var(--code-accent); }
+  .copy-btn { position: absolute; top: 8px; right: 8px; background: transparent; color: #7C86AC;
+    border: 1px solid #3A415E; border-radius: 5px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; padding: 3px 9px; cursor: pointer; }
+  .copy-btn:hover, .copy-btn:focus-visible { color: var(--code-accent); border-color: var(--code-accent); outline: none; }
+  code { font-family: 'IBM Plex Mono', monospace; font-size: .88em; background: var(--surface-2);
+    border-radius: 4px; padding: 1px 5px; }
+  .code code { background: none; padding: 0; }
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; margin: 12px 0; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted); padding: 9px 13px; border-bottom: 1px solid var(--line);
+    background: var(--surface-2); white-space: nowrap; }
+  td { padding: 8px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td code { white-space: nowrap; }
+  .callout { border: 1px solid var(--line); border-left: 4px solid var(--accent); background: var(--surface);
+    border-radius: 6px; padding: 13px 17px; margin: 14px 0; }
+  .callout.warn { border-left-color: var(--warn-line); background: var(--warn-bg); }
+  .callout.warn .co-label { color: var(--warn-ink); }
+  .callout.danger { border-left-color: var(--danger); background: var(--danger-bg); }
+  .callout.danger .co-label { color: var(--danger); }
+  .co-label { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 4px; }
+  .callout p { margin: 4px 0; }
+  ul, ol { padding-left: 1.3em; margin: 8px 0; }
+  li { margin: 5px 0; }
+  li::marker { color: var(--accent); }
+  /* 框图流程条 */
+  .flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; margin: 16px 0 8px; }
+  .flow .node { background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+    padding: 10px 14px; flex: 1 1 160px; min-width: 160px; }
+  .flow .node .t { font-weight: 700; font-size: 14px; }
+  .flow .node .d { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin-top: 2px; }
+  .flow .node.hot { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+  /* 目录 */
+  .toc { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; margin: 18px 0; }
+  .toc a { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+    padding: 9px 13px; text-decoration: none; color: var(--ink); font-size: 14px; }
+  .toc a:hover { border-color: var(--accent); }
+  .toc a .n { font-family: 'IBM Plex Mono', monospace; color: var(--accent); font-weight: 600; margin-right: 8px; }
+  a { color: var(--accent-ink); }
+  footer { margin-top: 72px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  @media (max-width: 560px) { h1 { font-size: 30px; } }
+</style>
+
+<div class="wrap">
+<header class="masthead">
+  <span class="eyebrow">g1_api · 架构与调用 · 面向系统工程师</span>
+  <h1>G1 系统全书</h1>
+  <p class="lede">一份从总到分的完整说明：这台 Unitree G1 上跑着什么、每一层怎么连、每个接口的语义细节，以及拿 Python 从外部把它调起来的实战范式。配套：《G1 快速上手》管开机，《G1 上机手册》管部署与排障，本书管"懂它"。</p>
+</header>
+
+<section>
+  <h2><span class="no">00</span>总览：一张图看懂全系统</h2>
+  <p class="h2-sub">核心思想：<b>g1_api 是唯一入口</b>。它对外提供思岚(Slamtec)风格 REST API（端口 1448），对内编排三条通道——ROS1 导航栈、Unitree DDS 服务、外部动作执行器。所有客户端（浏览器 /sdk、你的 Python 程序、导览逻辑）都只和它说话。</p>
+
+  <div class="flow">
+    <div class="node"><div class="t">客户端</div><div class="d">浏览器 /sdk 调试台 · /sdk/map-editor · 你的 Python 程序（requests）</div></div>
+    <div class="node hot"><div class="t">g1_api（FastAPI :1448）</div><div class="d">REST 网关 · 安全门 · 动作槽 · 地图库 · 导览编排 · roslaunch 生命周期管理</div></div>
+  </div>
+  <div class="flow">
+    <div class="node"><div class="t">① ROS1 Noetic 栈</div><div class="d">FAST-LIO2 定位/建图 · move_base+TEB（aero 源码栈）· /cmd_vel · TF。g1_api 用 rospy 直连 + 管理 roslaunch 子进程</div></div>
+    <div class="node"><div class="t">② DDS（unitree_sdk2py）</div><div class="d">LocoClient（行走/站立）· AudioClient（TTS/音量/LED）· ArmClient（官方手臂动作表）。走 eth0 内网</div></div>
+    <div class="node"><div class="t">③ 外部动作执行器</div><div class="d">g1_replay_min/action_server.py :9100 —— 回放 .npy 双臂轨迹（rt/arm_sdk）</div></div>
+    <div class="node"><div class="t">④ 灵巧手 server</div><div class="d">TCP 5678（课程自带）</div></div>
+  </div>
+
+  <h3>进程拓扑（真机五终端 + g1_api 托管的子进程）</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th>进程</th><th>谁启动</th><th>职责</th></tr>
+    <tr><td>roscore</td><td>终端①（人）</td><td>长驻 ROS master。绝不让 roslaunch 自动带起（那个 master 会随 launch 死）</td></tr>
+    <tr><td>速度桥 g1_control_vel.py</td><td>终端②（人）</td><td>/cmd_vel → LocoClient.Move。限幅 0.8/0.2/0.8，死区 0.1/0.1/0.15，5帧零速锁存</td></tr>
+    <tr><td>外部动作执行器</td><td>终端③（人）</td><td>HTTP :9100，单飞，子进程跑 replay_min --motion</td></tr>
+    <tr><td><b>g1_api</b></td><td>终端④（人，robot_g1api.sh）</td><td>一切 API；并<b>托管</b>导航/建图 roslaunch 子进程（:select / /mapping/:start 起停，孤儿清理）</td></tr>
+    <tr><td>导航栈 roslaunch</td><td>g1_api（:select 时）</td><td>livox 驱动 + FAST-LIO localizer + reloc 服务 + 栅格 + move_base(aero) + 点云→/scan</td></tr>
+    <tr><td>建图栈 roslaunch</td><td>g1_api（/mapping/:start 时）</td><td>驱动 + FAST-LIO mapping + octomap。与导航栈互斥（建图会话先停导航）</td></tr>
+  </table></div>
+
+  <h3>两张网（搞混必翻车）</h3>
+  <ul>
+    <li><b>外网 192.168.220.8</b>（静态）：ssh、REST 1448、笔记本 RViz、ROS_MASTER_URI/ROS_IP 都用它。</li>
+    <li><b>内网 eth0 = 192.168.123.x</b>：DDS（unitree_sdk2py）与 MID360 雷达的世界。<code>G1_API_MODE_NETWORK_INTERFACE=eth0</code> 与雷达配置永远不动。DDS 是多参与者总线——速度桥、执行器、g1_api 同时用 eth0 互不排斥。</li>
+  </ul>
+
+  <h3>目录</h3>
+  <div class="toc">
+    <a href="#s01"><span class="n">01</span>代码地图与分层规则</a>
+    <a href="#s02"><span class="n">02</span>动作系统（异步模型）</a>
+    <a href="#s03"><span class="n">03</span>地图·建图·定位</a>
+    <a href="#s04"><span class="n">04</span>导览编排</a>
+    <a href="#s05"><span class="n">05</span>声·光·臂·手</a>
+    <a href="#s06"><span class="n">06</span>外部动作（回放库）</a>
+    <a href="#s07"><span class="n">07</span>安全系统</a>
+    <a href="#s08"><span class="n">08</span>planner 与速度链</a>
+    <a href="#s09"><span class="n">09</span>事件流与可观测性</a>
+    <a href="#s10"><span class="n">10</span>配置速查</a>
+    <a href="#s11"><span class="n">11</span>Python 调用实战</a>
+    <a href="#s12"><span class="n">附</span>端点全表</a>
+  </div>
+</section>
+
+<section id="s01">
+  <h2><span class="no">01</span>代码地图与分层规则</h2>
+  <p class="h2-sub">仓库 <code>g1_api/</code> 是严格分层的 Python 包（3.8 语法），分层由测试强制（layering test 会拒绝违规 import）。</p>
+  <div class="tbl-wrap"><table>
+    <tr><th>层</th><th>目录</th><th>职责</th><th>规则</th></tr>
+    <tr><td>模型</td><td><code>g1_api/models/</code></td><td>纯数据结构与纯逻辑：动作参数、地图包(.g1map)、航迹点、外部动作元数据、互锁枚举</td><td rowspan="4">models/core/state/adapters/services/tour <b>禁止</b> import fastapi/pydantic/网络客户端（utils 与 adapters 豁免）</td></tr>
+    <tr><td>核心</td><td><code>g1_api/core/</code></td><td>RobotCore：时钟、事件总线、<b>安全门</b>、动作注册表、任务管理器（动作槽）</td></tr>
+    <tr><td>适配器</td><td><code>g1_api/adapters/</code></td><td><code>mock/</code> 全功能仿真世界（202+ 测试的地基）；<code>g1/</code> 真机：RosBridge(rospy)、DdsBridge(unitree_sdk2py，可打桩 stub)、LaunchManager(roslaunch 子进程)</td></tr>
+    <tr><td>服务</td><td><code>g1_api/services/</code></td><td>用例逻辑：每个动词先过安全门再调 adapter（map/motion/voice/arm/hand/external_actions/tour_service…）</td></tr>
+    <tr><td>网关</td><td><code>g1_api/gateway/</code></td><td>FastAPI 路由（薄）：解 JSON → 调 service → problem+json 错误</td></tr>
+    <tr><td>导览</td><td><code>g1_api/tour/</code></td><td>TourExecutor 状态机——吃自己的狗粮：每条腿走内部动作 API，不直捅 adapter</td></tr>
+    <tr><td>控制台</td><td><code>g1_api/console/</code></td><td>/sdk 调试台与 /sdk/map-editor（原生 JS，meta 驱动）</td></tr>
+    <tr><td>部署</td><td><code>deploy/</code></td><td>robot_*.sh 四脚本、两个 launch、速度桥副本、aero 编译脚本</td></tr>
+  </table></div>
+  <p>请求生命线：<code>HTTP → gateway 路由 → service.guard(安全门) → adapter(mock 或 g1) → 硬件/仿真</code>。mock 与真机共享全部上层代码——所以仿真验证过的逻辑真机同构。</p>
+</section>
+
+<section id="s02">
+  <h2><span class="no">02</span>动作系统：思岚异步模型</h2>
+  <p class="h2-sub">所有"让机器人动"的请求都是<b>动作</b>：提交即返回，轮询看进度。全局<b>单槽</b>——同一时刻只有一个运动动作在跑，新动作顶替旧动作。</p>
+  <div class="code"><pre><span class="cm"># 提交（立即返回 action_id）</span>
+POST /api/core/motion/v1/actions
+{"action_name": "slamtec.agent.actions.MoveToAction",
+ "options": {"target": {"x": 1.0, "y": 0.5}, "yaw": 0.0, "with_yaw": true,
+             "reach_threshold": 0.35, "yaw_threshold": 0.5, "timeout_s": 180}}
+
+<span class="cm"># 轮询（:current 或 /{action_id}）；DELETE :current = 取消</span>
+GET /api/core/motion/v1/actions/:current
+→ {"state": {"status": 1, "result": 0, "reason": ""}}</pre></div>
+  <div class="tbl-wrap"><table>
+    <tr><th>字段</th><th>取值</th><th>语义</th></tr>
+    <tr><td>state.status</td><td>0 / 1 / 4</td><td>排队 / 执行中 / <b>终态</b></td></tr>
+    <tr><td>state.result</td><td>0 / -1 / -2</td><td>成功 / 失败 / 被取消（仅终态有意义）</td></tr>
+    <tr><td>failure_code</td><td>TIMEOUT · GOAL_UNREACHABLE · CANCELLED_BY_USER…</td><td>失败分类</td></tr>
+    <tr><td>GET :current → 404</td><td colspan="2"><b>404 = 空闲</b>，是正常语义不是错误（思岚约定）</td></tr>
+  </table></div>
+
+  <h3>MoveTo 全链路（aero 分层到点）</h3>
+  <div class="flow">
+    <div class="node"><div class="t">第0层 预转向</div><div class="d">调 /move_base/make_plan 只算不走，取全局路径前 0.5m 方向；与当前朝向差 &gt;57° 就原地慢转到 &lt;23° 再出发</div></div>
+    <div class="node hot"><div class="t">第1层 位置=planner 说了算</div><div class="d">发布目标；TEB yaw 容差=2π（不管朝向），xy 进 0.35 圈立即 SUCCEEDED；消费 /move_base/result</div></div>
+    <div class="node"><div class="t">第2层 朝向收口</div><div class="d">with_yaw=true 时原地慢转(0.41 rad/s)到 yaw_threshold（默认 0.5≈±28.6°）内</div></div>
+  </div>
+  <ul>
+    <li>planner ABORTED（如"Robot is oscillating"）→ 动作失败，<b>planner 原因原文透传</b>到 reason。</li>
+    <li>TF 只做事后复核；位置超出 reach_threshold 才触发兜底细调（只收到 reach_threshold，不过度矫正）。</li>
+    <li>其余动作：MoveAction（定时定速遥控，不避障，受 ALLOW_MOTION 独立开关）、Rotate/RotateTo（原地转）。工厂列表见 <code>GET /action-factories</code>。</li>
+  </ul>
+  <div class="callout"><span class="co-label">容差三层</span>
+    <p>① TEB <code>xy_goal_tolerance=0.35</code>（planner 宣告半径，yaml）② API <code>reach_threshold=0.35</code>/<code>yaw_threshold=0.5</code>（校验与收口，默认值，可每请求/每航迹点覆盖）③ 想要"正对展品"就把该点 yaw_threshold 单独收到 0.15。</p>
+  </div>
+</section>
+
+<section id="s03">
+  <h2><span class="no">03</span>地图 · 建图 · 定位</h2>
+  <h3>建图会话（/mapping，四端点状态机）</h3>
+  <div class="code"><pre>POST /api/core/slam/v1/mapping/:start    <span class="cm"># 停导航栈 → 起 FAST-LIO 建图栈</span>
+GET  /api/core/slam/v1/mapping           <span class="cm"># 会话状态</span>
+POST /api/core/slam/v1/mapping/:finish   {"map_id":"changdi-1f","name":"场地一层"}
+POST /api/core/slam/v1/mapping/:cancel   <span class="cm"># 放弃，产物不入库</span></pre></div>
+  <p>:finish 自动：存 2D 栅格 → 停栈存点云 → 校验产物新鲜度 → 打包 <code>.g1map</code> 入库 → <b>停掉建图 ROS 进程</b>（后台保持干净）。建图期间 <code>mapping_running</code> 互锁挡导航/导览，遥控(MOTION)保留用于驱动扫图。</p>
+
+  <h3>.g1map 包与地图库</h3>
+  <p><code>.g1map</code> = tar.gz（<code>map.pcd</code> 3D 点云 + <code>ground_map.pcd</code> + <code>grid.pgm/yaml</code> 2D 栅格 + <code>manifest.json</code> 含航迹点 + checksums）。库在 <code>g1_api_maps/</code>（挂载卷持久）。上传/下载/删除见附录端点表；<b>栅格可在线改</b>（GET/PUT /{id}/grid，编辑器画墙擦墙就是这两条）。</p>
+
+  <h3>:select 与重定位（服务重启后的必经两步）</h3>
+  <div class="code"><pre>POST /maps/{id}/:select        <span class="cm"># 停旧导航栈 → 以该图三个文件为参数重启导航 launch</span>
+                               <span class="cm"># 就绪门：/slam_reloc 服务 + move_base 注册（TCP 实测，防僵尸）</span>
+POST /localization/:relocalize {"x":0,"y":0,"yaw":0}   <span class="cm"># 机器人须物理摆在地标位</span>
+GET  /localization/pose        <span class="cm"># TF map→body 的实时位姿</span></pre></div>
+  <p>TF 链：<code>map → local →（FAST-LIO 定位）→ body →（静态 π 翻转）→ base_link</code>。重定位是 ICP 配准（/slam_reloc 服务），朝向大致对齐即可收敛（实测 4cm 级）。</p>
+</section>
+
+<section id="s04">
+  <h2><span class="no">04</span>导览编排</h2>
+  <p class="h2-sub">航迹点<b>随地图保存</b>（manifest 里），编辑器点选配置。导览执行器逐点：MoveTo（分层到点）→ 并行【动作序列 + TTS】→ 停留 → 下一点。</p>
+  <div class="code"><pre>PUT  /api/core/slam/v1/maps/{id}/tour-points   <span class="cm"># 写航迹点（编辑器自动调）</span>
+{"points": [{"name":"P1","x":0.5,"y":0,"yaw":0,
+  "actions":[{"executor":"onboard","type":"arm","id":26},
+             {"executor":"external","type":"replay","id":"pick-cube"}],
+  "tts_text":"Welcome.","dwell_s":1.0,
+  "reach_threshold":0.35,"yaw_threshold":0.5}]}
+
+POST /api/tour/v1/tours/:start | :pause | :resume | :stop
+GET  /api/tour/v1/tours/:current     <span class="cm"># 每点 pending/succeeded/failed/skipped</span></pre></div>
+  <ul>
+    <li>每点动作二選一执行器：<b>onboard</b>（官方手臂 id / 灵巧手 cmd，过安全门）；<b>external</b>（回放库 id 或自定义类型，见 06）。</li>
+    <li>失败策略 <code>on_failure</code>：abort（默认）/ skip / retry_once。外部动作失败<b>永不中断导览</b>（只记事件）。</li>
+    <li>导览运行中 <code>tour_running</code> 互锁挡手动运动指令——但导览自己的腿不受限（内部把该互锁豁免）。</li>
+  </ul>
+</section>
+
+<section id="s05">
+  <h2><span class="no">05</span>声 · 光 · 臂 · 手</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th>功能</th><th>端点</th><th>细节</th></tr>
+    <tr><td>TTS</td><td><code>POST /voice/v1/tts</code></td><td><code>{"text","speaker_id"?,"wait"?}</code>。speaker 0=中文 1=English；<b>不带时走配置默认</b>（真机已配英文）。无完成回调，时长按字数估算</td></tr>
+    <tr><td>音量</td><td><code>GET/PUT /voice/v1/volume</code></td><td>0-100</td></tr>
+    <tr><td>LED</td><td><code>PUT /voice/v1/led</code></td><td><code>{"r","g","b","hold_s"?}</code>。机器人自身状态灯会覆写颜色，hold_s 每秒重发保持</td></tr>
+    <tr><td>手臂</td><td><code>GET /arm/v1/action-list</code><br><code>POST /arm/v1/actions</code></td><td>官方动作表（启动时从真机拉取缓存，id+名称）；执行后自动 release(99)+3s 静置。26=高挥手</td></tr>
+    <tr><td>灵巧手</td><td><code>POST /hand/v1/command</code></td><td><code>{"cmd":"7"}</code> 透传 TCP 5678 的手部 server</td></tr>
+  </table></div>
+  <p>这三者都是 DDS RPC（voice 服务/arm 服务），与行走并行不冲突；返回码非零会转成 API 错误（不吞错）。</p>
+</section>
+
+<section id="s06">
+  <h2><span class="no">06</span>外部动作：回放库</h2>
+  <p class="h2-sub">把录制的双臂关节轨迹（.npy，N×≥14 @录制频率）当官方动作用：上传入库 → 列表 → 按 id 执行。g1_api 只当图书馆+调度；真正驱动的是 <code>g1_replay_min/action_server.py</code>（:9100，走 <code>rt/arm_sdk</code>：29 号权重位接管双臂、腿仍归运控、结束权重缓降交还——与行走控制天然共存）。</p>
+  <div class="code"><pre><span class="cm"># 上传（body=.npy 原始字节；frequency 必须=录制频率；query 仅 ASCII——网页 /sdk 上传无此限制）</span>
+POST /api/core/motion/v1/external-actions?name=pick-cube&amp;frequency=30&amp;velocity_limit=20
+GET  /api/core/motion/v1/external-actions            <span class="cm"># 库列表（id/帧数/时长）</span>
+POST /api/core/motion/v1/external-actions/{id}/:execute   <span class="cm"># 同步：返回=回放结束</span>
+DELETE /api/core/motion/v1/external-actions/{id}</pre></div>
+  <ul>
+    <li>执行期挂 <code>external_motion_running</code> 互锁：官方手臂/导航/导览启动 409；MOTION 遥控保留逃生。执行器单飞（忙 409）。</li>
+    <li>g1_api → 执行器契约：POST <code>{"action": {"type":"replay","id","file","frequency","velocity_limit","duration_s",…}}</code>，超时=时长+30s。</li>
+    <li>导览引用：<code>{"executor":"external","type":"replay","id":"x"}</code>（编辑器下拉直接选）；<code>type</code> 本身是库 id 也认。不在库里的自定义类型原样透传——这是接<b>你自己的执行器</b>的缝。</li>
+  </ul>
+</section>
+
+<section id="s07">
+  <h2><span class="no">07</span>安全系统</h2>
+  <p class="h2-sub">每个状态改变请求过<b>安全门</b>：先查能力开关（环境变量，默认全关），再查命名互锁。拒绝=409 + problem-json，body 里带互锁名清单——排障永远先看它。</p>
+  <h3>能力开关（G1_API_SAFETY_ALLOW_*，默认 false）</h3>
+  <p>MOTION（不避障遥控，日常不开）· NAVIGATION · MAP_WRITE · ARM · HAND · VOICE · TOUR。急停类停止命令<b>永远放行</b>，任何开关拦不住。</p>
+  <h3>命名互锁（状态类）</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th>互锁</th><th>亮起原因</th><th>挡什么</th></tr>
+    <tr><td>roscore_down / move_base_down</td><td>ROS 侧没起/僵死（TCP 实测）</td><td>导航类</td></tr>
+    <tr><td>velocity_bridge_down</td><td>速度桥进程死了</td><td>一切会动的</td></tr>
+    <tr><td>map_not_selected / localization_not_initialized</td><td>没 :select / 没重定位</td><td>导航、导览</td></tr>
+    <tr><td>tour_running</td><td>导览进行中</td><td>手动运动/臂/手（导览自身豁免）</td></tr>
+    <tr><td>mapping_running</td><td>建图会话中</td><td>导航、导览（遥控保留）</td></tr>
+    <tr><td>external_motion_running</td><td>回放执行中</td><td>官方手臂、导航、导览启动</td></tr>
+  </table></div>
+  <p>速度钳制：MoveAction 的线/角速度超 SafetyConfig 上限会被钳制并标注。全部决策带 command_id 审计日志。</p>
+</section>
+
+<section id="s08">
+  <h2><span class="no">08</span>planner 与速度链</h2>
+  <h3>aero 栈（默认）vs course 栈</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th></th><th>aero（G1_API_PLANNER=aero，默认）</th><th>course（=course 时回退）</th></tr>
+    <tr><td>move_base 来源</td><td>源码 overlay（AeroMaze_ws，含自定义 PathBoundryLayer 走廊层）</td><td>apt + xju_pnc 配置</td></tr>
+    <tr><td>到点判定</td><td>分层：planner result(位置) + API 旋转(朝向)</td><td>TF 三阶段（粗到点→旋转→细调）</td></tr>
+    <tr><td>障碍源</td><td>3D 点云 + map 系高度带[离地 0.3~1.35m]（俯仰免疫，防地面假障碍）</td><td>/scan 静态切片（俯仰大会漏地面）</td></tr>
+    <tr><td>切换方式</td><td colspan="2">robot_g1api.sh 环境变量；aero 需 overlay 编译过一次（robot_build_aero.sh）</td></tr>
+  </table></div>
+  <h3>速度链（每一级都可能是"为什么这么慢"的答案）</h3>
+  <div class="flow">
+    <div class="node"><div class="t">TEB</div><div class="d">规划上限 0.8/0/0.8（yaml，=桥上限对齐）；free_goal_vel=true 带速进圈防死区爬行</div></div>
+    <div class="node"><div class="t">/cmd_vel</div><div class="d">move_base 输出（g1_api 的旋转/细调也发这里）</div></div>
+    <div class="node hot"><div class="t">速度桥</div><div class="d">死区裁剪 0.1/0.1/0.15 → EMA(α=0.15) → 限幅 0.8/0.2/0.8 → LocoClient.Move；5帧零速锁存</div></div>
+    <div class="node"><div class="t">G1 运控</div><div class="d">固件行走控制器（走跑模式）</div></div>
+  </div>
+  <p>要点：TEB 是 diff-drive 调法（不横移）；倒退被禁（身后目标=预转向+转身，见 02）；桥参数可 <code>G1_VEL_MAX_VX=…</code> 环境变量覆盖。</p>
+</section>
+
+<section id="s09">
+  <h2><span class="no">09</span>事件流与可观测性</h2>
+  <div class="code"><pre>GET /api/tour/v1/events?from_cursor=evt_00000042   <span class="cm"># 增量拉取（cursor 游标）</span>
+<span class="cm"># 事件类型：action_created/started/succeeded/failed · point_reached/failed ·</span>
+<span class="cm"># tts_started · action_done · external_action_skipped/failed …</span></pre></div>
+  <ul>
+    <li><code>GET /healthz</code> 存活；<code>GET /robot/health</code> 互锁清单（运维第一入口）；<code>GET /robot/info</code> 标识。</li>
+    <li>日志：g1_api stdout；导航栈 <code>/tmp/g1_api_navigation_launch.log</code>；建图栈 <code>/tmp/g1_api_mapping_launch.log</code>。</li>
+    <li>动作失败的 reason 是一手信息（planner 原因原文透传），先读 reason 再翻日志。</li>
+  </ul>
+</section>
+
+<section id="s10">
+  <h2><span class="no">10</span>配置速查（环境变量 → 行为）</h2>
+  <p class="h2-sub">规则：<code>G1_API_&lt;节&gt;_&lt;字段&gt;</code>。全部已沉淀进 <code>deploy/robot_g1api.sh</code>，此表用于"读懂脚本"。</p>
+  <div class="tbl-wrap"><table>
+    <tr><th>变量</th><th>真机值</th><th>作用</th></tr>
+    <tr><td>G1_API_MODE</td><td>real</td><td>mock/real 适配器</td></tr>
+    <tr><td>G1_API_MODE_NETWORK_INTERFACE</td><td>eth0</td><td>DDS 网卡（必填防呆）</td></tr>
+    <tr><td>G1_API_MODE_DDS_BACKEND</td><td>real</td><td>stub 时 DDS 打桩（仿真用）</td></tr>
+    <tr><td>G1_API_PLANNER（脚本变量）</td><td>aero</td><td>选导航 launch + nav_feedback + overlay source</td></tr>
+    <tr><td>G1_API_MODE_NAV_FEEDBACK</td><td>planner</td><td>到点判定：planner 结果 / tf 三阶段</td></tr>
+    <tr><td>G1_API_MODE_LAUNCH_FILE / MAPPING_LAUNCH_FILE</td><td>deploy/ 两个 launch</td><td>:select 与 /mapping 托管的 launch</td></tr>
+    <tr><td>G1_API_MAP_MAP_STORAGE_DIR</td><td>…/g1_api_maps</td><td>地图库（挂载卷持久）</td></tr>
+    <tr><td>G1_API_TOUR_EXTERNAL_ACTIONS_DIR / EXECUTOR_URL</td><td>…/g1_api_external_actions · :9100</td><td>回放库与执行器</td></tr>
+    <tr><td>G1_API_VOICE_DEFAULT_SPEAKER_ID</td><td>1</td><td>TTS 默认英文</td></tr>
+    <tr><td>G1_API_SAFETY_ALLOW_*</td><td>除 MOTION 全 true</td><td>能力开关（07）</td></tr>
+    <tr><td>G1_VEL_MAX_* / G1_VEL_DEADBAND_*</td><td>桥默认</td><td>速度桥限幅/死区临时覆盖</td></tr>
+  </table></div>
+</section>
+
+<section id="s11">
+  <h2><span class="no">11</span>Python 调用实战</h2>
+  <p class="h2-sub">可运行完整版在仓库 <code>docs/examples/g1_client_demo.py</code>（仅依赖 requests）。下面按场景拆讲。</p>
+
+  <h3>骨架：一个 50 行的客户端</h3>
+  <div class="code"><pre>import requests, time
+
+class G1Client:
+    def __init__(self, base="http://192.168.220.8:1448"):
+        self.base = base.rstrip("/"); self.s = requests.Session()
+
+    def submit_action(self, name, options):
+        r = self.s.post(self.base + "/api/core/motion/v1/actions",
+                        json={"action_name": name, "options": options}, timeout=10)
+        r.raise_for_status()
+        return r.json()["action_id"]
+
+    def wait_action(self, aid, timeout_s=180):
+        deadline = time.monotonic() + timeout_s
+        while time.monotonic() &lt; deadline:
+            r = self.s.get(self.base + "/api/core/motion/v1/actions/%s" % aid, timeout=10)
+            st = r.json()["state"]
+            if st["status"] == 4:          <span class="cm"># 终态：result 0/-1/-2</span>
+                return r.json()
+            time.sleep(0.5)
+        self.s.delete(self.base + "/api/core/motion/v1/actions/:current", timeout=10)
+        raise TimeoutError(aid)</pre></div>
+
+  <h3>场景 1：开机后把系统带到"能干活"</h3>
+  <div class="code"><pre>c = G1Client()
+print(c.s.get(c.base + "/api/core/system/v1/robot/health").json()["interlocks"])
+<span class="cm"># 预期只剩 map_not_selected / localization_not_initialized</span>
+
+c.s.post(c.base + "/api/core/slam/v1/maps/delta/:select", timeout=150).raise_for_status()
+<span class="cm"># 机器人物理摆到地标位后：</span>
+c.s.post(c.base + "/api/core/slam/v1/localization/:relocalize",
+         json={"x": 0, "y": 0, "yaw": 0}, timeout=60).raise_for_status()</pre></div>
+
+  <h3>场景 2：导航到点 + 正确处理三种结局</h3>
+  <div class="code"><pre>aid = c.submit_action("slamtec.agent.actions.MoveToAction",
+    {"target": {"x": 2.0, "y": 1.0}, "yaw": 1.57, "with_yaw": True})
+final = c.wait_action(aid)
+st = final["state"]
+if st["result"] == 0:
+    print("到点：", st["reason"])          <span class="cm"># "planner reached position; heading aligned"</span>
+elif final.get("failure_code") == "GOAL_UNREACHABLE":
+    print("planner 拒绝：", st["reason"])   <span class="cm"># planner 原因原文，如 oscillating</span>
+else:
+    print("超时/取消：", final.get("failure_code"), st["reason"])</pre></div>
+
+  <h3>场景 3：外部动作——上传一次，处处按 id 用</h3>
+  <div class="code"><pre>with open("wave.npy", "rb") as f:
+    c.s.post(c.base + "/api/core/motion/v1/external-actions",
+             params={"name": "wave", "frequency": 30, "velocity_limit": 10},
+             data=f.read(),
+             headers={"Content-Type": "application/octet-stream"}).raise_for_status()
+
+r = c.s.post(c.base + "/api/core/motion/v1/external-actions/wave/:execute", timeout=120)
+<span class="cm"># 200 = 回放完成；409 = 执行器没起/正忙/互锁；期间官方手臂与导航都会被 409 挡</span></pre></div>
+
+  <h3>场景 4：导览 + 事件流实时观察</h3>
+  <div class="code"><pre>c.s.put(c.base + "/api/core/slam/v1/maps/delta/tour-points", json={"points": [
+    {"name": "P1", "x": 1.0, "y": 0.0, "yaw": 0.0, "dwell_s": 2.0,
+     "tts_text": "This is our first exhibit.",
+     "actions": [{"executor": "external", "type": "replay", "id": "wave"}]},
+]}, timeout=15).raise_for_status()
+c.s.post(c.base + "/api/tour/v1/tours/:start", timeout=10).raise_for_status()
+
+cursor = None
+while True:
+    params = {"from_cursor": cursor} if cursor else {}
+    for e in c.s.get(c.base + "/api/tour/v1/events", params=params, timeout=10).json()["events"]:
+        cursor = e["cursor"]; print(e["type"], e.get("payload"))
+    if c.s.get(c.base + "/api/tour/v1/tours/:current", timeout=10).json()["status"] \
+            in ("finished", "failed", "stopped"):
+        break
+    time.sleep(1)</pre></div>
+
+  <h3>场景 5：错误处理范式（409 的正确姿势）</h3>
+  <div class="code"><pre>r = c.s.post(c.base + "/api/core/arm/v1/actions", json={"action_id": 26}, timeout=30)
+if r.status_code == 409:
+    problem = r.json()
+    print("被安全门拒绝，互锁：", problem.get("interlocks") or problem.get("details"))
+    <span class="cm"># 对照 07 节表：是开关没开(xxx_not_allowed)还是状态没就绪(xxx_down/running)</span>
+else:
+    r.raise_for_status()</pre></div>
+
+  <div class="callout warn"><span class="co-label">外部程序四条纪律</span>
+    <p>① 动作是异步的：<b>永远轮询到终态</b>再发下一个（单槽，新动作会顶掉旧的）。② 409 不是 bug，是安全门在说话——读互锁名。③ 运动指令单一来源：你的程序在跑就别同时用 RViz/网页发目标。④ 长超时给足：:select 要重启导航栈（~90s 门限），外部动作=轨迹时长+30s。</p>
+  </div>
+</section>
+
+<section id="s12">
+  <h2><span class="no">附</span>端点全表</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th>域</th><th>端点</th></tr>
+    <tr><td>系统</td><td><code>GET /healthz</code> · <code>GET /api/core/system/v1/robot/health</code> · <code>/robot/info</code> · <code>/capabilities</code></td></tr>
+    <tr><td>动作</td><td><code>GET /api/core/motion/v1/action-factories</code> · <code>POST /actions</code> · <code>GET /actions/:current | /{id}</code> · <code>DELETE /actions/:current</code></td></tr>
+    <tr><td>外部动作</td><td><code>GET|POST /api/core/motion/v1/external-actions</code> · <code>GET /{id} | /{id}/file</code> · <code>POST /{id}/:execute</code> · <code>DELETE /{id}</code></td></tr>
+    <tr><td>地图</td><td><code>GET|POST /api/core/slam/v1/maps</code> · <code>GET /maps/:current | /{id}/package</code> · <code>POST /{id}/:select</code> · <code>DELETE /{id}</code> · <code>GET|PUT /{id}/grid</code> · <code>PUT /{id}/tour-points</code></td></tr>
+    <tr><td>建图</td><td><code>POST /mapping/:start | :finish | :cancel</code> · <code>GET /mapping</code></td></tr>
+    <tr><td>定位</td><td><code>GET /localization/pose | /status</code> · <code>POST /localization/:relocalize</code></td></tr>
+    <tr><td>导览</td><td><code>GET|PUT /api/tour/v1/tours</code> · <code>POST :start|:pause|:resume|:stop</code> · <code>GET :current</code> · <code>GET /events</code></td></tr>
+    <tr><td>声光臂手</td><td><code>POST /voice/v1/tts</code> · <code>GET|PUT /volume</code> · <code>PUT /led</code> · <code>GET /arm/v1/action-list</code> · <code>POST /arm/v1/actions</code> · <code>POST /hand/v1/command</code></td></tr>
+  </table></div>
+  <p>交互式版本：浏览器开 <code>http://192.168.220.8:1448/sdk</code>——每个端点带中文说明、可编辑样例、Execute 按钮与 curl 生成；<code>/openapi.json</code> 有机器可读 schema。</p>
+</section>
+
+<footer>
+  <p>文档家族：《G1 快速上手》（开机干活）· 《G1 上机手册》（部署/排障/SOP）· 本书（架构与调用）。仓库镜像 <code>g1_api/docs/system_bible.html</code>，示例代码 <code>docs/examples/g1_client_demo.py</code>，已知缺口 <code>docs/TODO.md</code>。</p>
+</footer>
+</div>
+
+<script>
+  document.querySelectorAll('.code').forEach(function (block) {
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '复制';
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText(block.querySelector('pre').innerText).then(function () {
+        btn.textContent = '已复制';
+        setTimeout(function () { btn.textContent = '复制'; }, 1500);
+      });
+    });
+    block.appendChild(btn);
+  });
+</script>

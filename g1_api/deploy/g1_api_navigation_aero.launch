@@ -1,0 +1,100 @@
+<!-- AeroMaze planner variant of g1_api_navigation.launch.
+
+     Same FAST-LIO localization / reloc / gridmap bringup as the course
+     variant; move_base comes from the source-built AeroMazePlanner-ST-nav
+     overlay (custom costmap_2d::PathBoundryLayer corridor plugin + the
+     robot_settings G1 tuning).
+
+     REQUIRES the overlay workspace sourced before roslaunch, e.g.
+       source /home/unitree/abotclaw_nv/navigate/AeroMaze_ws/devel/setup.bash
+     g1_api does this itself when G1_API_MODE_NAV_LAUNCH_SETUP points at that
+     setup.bash (robot_g1api.sh: G1_API_PLANNER=aero). Without the overlay,
+     $(find robot_settings) fails fast; the apt nav stack is never mixed in.
+
+     Pair with G1_API_MODE_NAV_FEEDBACK=planner. Layered arrival: TEB's
+     yaw_goal_tolerance is 2*pi so /move_base/result SUCCEEDED means
+     "position reached" only; g1_api then rotates in place to the requested
+     heading (yaw_threshold). The course TEB-vs-reach_threshold invariant
+     does not apply here.
+
+     Wiring-only overrides below (grid topic /map_2d, local costmap frame,
+     cmd_vel/odom remaps); the robot_settings G1 tuning itself is untouched.
+     PathBoundryLayer stays inert until something publishes
+     /path_boundry_path, so it is safe to always load.
+-->
+<launch>
+    <arg name="pcd_path" default="/home/unitree/abotclaw_nv/navigate/map/map.pcd" />
+    <arg name="ground_pcd_path" default="/home/unitree/abotclaw_nv/navigate/map/ground_map.pcd" />
+    <arg name="grid_yaml" default="/home/unitree/abotclaw_nv/navigate/map/mymap.yaml" />
+    <arg name="rviz" default="false" />
+    <!-- /scan 高度切片下限，同 g1_api_navigation.launch 的说明（-0.85 = 雷达下方
+         0.85m 以下丢弃，防走路俯仰把地面扫进代价地图）。 -->
+    <arg name="scan_min_height" default="-0.85" />
+
+    <node pkg="tf" type="static_transform_publisher" name="base_to_body"
+          args="0.0 0 0.0 3.1416 3.1416 0 /body /base_link 1" />
+
+    <include file="$(find livox_ros_driver2)/launch_ROS1/msg_MID360.launch">
+    </include>
+
+    <rosparam command="load" file="$(find fastlio)/config/localize.yaml" />
+    <node pkg="fastlio" type="localizer_node" name="localizer_node" output="screen"/>
+
+    <node pkg="fastlio" type="slam_reloc.py" name="slam_reloc" output="screen">
+        <param name="pcd_path" value="$(arg pcd_path)" />
+    </node>
+
+    <include file="$(find fastlio)/launch/gridmap_load.launch">
+        <arg name="rviz" value="$(arg rviz)"/>
+        <arg name="2dmap_file" value="$(arg grid_yaml)"/>
+    </include>
+
+    <include file="$(find tool)/launch/downsample_pointcloud.launch">
+        <arg name="pcd_file" value="$(arg ground_pcd_path)"/>
+    </include>
+
+    <node pkg="tf" type="static_transform_publisher" name="slam_odom_to_odom"
+          args="0 0 0 0 0 0 /slam_odom /odom 100" />
+
+    <!-- move_base from the AeroMaze overlay (resolves to the source build when
+         the overlay is sourced; that build registers PathBoundryLayer). -->
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+        <rosparam file="$(find robot_settings)/cfg/G1/move_base_params.yaml" command="load"/>
+        <rosparam file="$(find robot_settings)/cfg/G1/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find robot_settings)/cfg/G1/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find robot_settings)/cfg/G1/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_settings)/cfg/G1/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_settings)/cfg/G1/teb_local_planner_params.yaml" command="load" />
+
+        <!-- Wiring overrides for this stack (config files expect /map + odom
+             frame; our gridmap publishes /map_2d and the odom chain is not in
+             the TF tree, so both costmaps run in the map frame like the
+             course stack does). -->
+        <param name="global_costmap/static_layer/map_topic" value="/map_2d"/>
+        <param name="local_costmap/static_layer/map_topic" value="/map_2d"/>
+        <param name="local_costmap/global_frame" value="map"/>
+
+        <remap from="cmd_vel" to="/cmd_vel"/>
+        <remap from="odom" to="slam_odom"/>
+    </node>
+
+    <!-- point_to_scan 内联（替代课程 include），仅 min_height 参数化。 -->
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+        <remap from="cloud_in" to="/base_link_cloud"/>
+        <param name="transform_tolerance" value="0.01" />
+        <param name="min_height" value="$(arg scan_min_height)" />
+        <param name="max_height" value="0.15" />
+        <param name="angle_min" value="-3.1425926" />
+        <param name="angle_max" value="3.1415926" />
+        <param name="angle_increment" value="0.007" />
+        <param name="scan_time" value="0.1" />
+        <param name="range_min" value="0.2" />
+        <param name="range_max" value="100" />
+        <param name="use_inf" value="true" />
+        <param name="inf_epsilon" value="1.0" />
+        <param name="concurrency_level" value="1" />
+    </node>
+    <include file="$(find tool)/launch/body2any_pointcloud.launch" />
+    <include file="$(find velocity_smoother_ema)/launch/velocity_smoother_ema.launch" />
+</launch>

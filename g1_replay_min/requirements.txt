@@ -1,0 +1,11 @@
+# ---- 必需 ----
+numpy
+cyclonedds==0.10.2          # 版本必须锁死，unitree_sdk2py 只兼容 0.10.2
+# unitree_sdk2py            # 不在 PyPI 上，需从源码装：
+#                             pip install -e <unitree_sdk2_python> --no-deps
+
+# ---- 可选 ----
+# pinocchio                 # 重力补偿。建议用 conda 装：
+#                             conda install -c conda-forge pinocchio
+#                           不装则前馈力矩为零，手臂下垂 2~3 度
+# pyarrow                   # 只在直接读 .parquet 时需要；用 .npy 不需要

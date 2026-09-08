@@ -1,0 +1,268 @@
+<title>G1 快速上手</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --bg: #F7F5F1; --surface: #FFFFFF; --surface-2: #F0EBE2;
+    --ink: #241F17; --muted: #6E6455; --line: #E0D8CA;
+    --accent: #9A6A0F; --accent-ink: #6E4A05;
+    --code-bg: #211B12; --code-ink: #E6DDCB; --code-accent: #E0B45C;
+    --danger: #A6402C; --danger-bg: #F9ECE8;
+    --ok: #2E7D4F; --ok-bg: #E9F2EA;
+    --warn-bg: #FBF3E0; --warn-line: #E3C46E; --warn-ink: #7A5A10;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16130E; --surface: #1F1A13; --surface-2: #292217;
+      --ink: #EAE3D6; --muted: #A2977F; --line: #3A3223;
+      --accent: #D9A83E; --accent-ink: #E0B45C;
+      --code-bg: #0F0C07; --code-ink: #D8CFBB; --code-accent: #D9A83E;
+      --danger: #E08A73; --danger-bg: #33201A;
+      --ok: #6FBF8E; --ok-bg: #182A1E;
+      --warn-bg: #2A2413; --warn-line: #6E5A1E; --warn-ink: #E0C36A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16130E; --surface: #1F1A13; --surface-2: #292217;
+    --ink: #EAE3D6; --muted: #A2977F; --line: #3A3223;
+    --accent: #D9A83E; --accent-ink: #E0B45C;
+    --code-bg: #0F0C07; --code-ink: #D8CFBB; --code-accent: #D9A83E;
+    --danger: #E08A73; --danger-bg: #33201A;
+    --ok: #6FBF8E; --ok-bg: #182A1E;
+    --warn-bg: #2A2413; --warn-line: #6E5A1E; --warn-ink: #E0C36A;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Noto Sans SC', 'IBM Plex Sans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-size: 15.5px; line-height: 1.75; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 44px 24px 96px; }
+  header.masthead { border-bottom: 3px solid var(--accent); padding-bottom: 24px; margin-bottom: 36px; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  h1 { font-family: 'IBM Plex Sans', 'Noto Sans SC', sans-serif; font-size: 38px; font-weight: 700;
+    margin: 8px 0 10px; text-wrap: balance; }
+  .lede { color: var(--muted); max-width: 44em; margin: 0; }
+  section { margin-top: 52px; }
+  h2 { font-size: 23px; font-weight: 700; margin: 0 0 6px; display: flex; align-items: baseline; gap: 12px; }
+  h2 .no { font-family: 'IBM Plex Mono', monospace; font-size: 15px; color: var(--accent); font-weight: 600; }
+  .h2-sub { color: var(--muted); margin: 0 0 18px; max-width: 46em; }
+  h3 { font-size: 16.5px; font-weight: 700; margin: 24px 0 8px; }
+  .code { position: relative; background: var(--code-bg); color: var(--code-ink);
+    border-radius: 8px; margin: 12px 0; overflow: hidden; }
+  .code pre { margin: 0; padding: 13px 16px; overflow-x: auto;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; line-height: 1.65; }
+  .code .cm { color: #8B8060; }
+  .code .hl { color: var(--code-accent); }
+  .copy-btn { position: absolute; top: 8px; right: 8px; background: transparent; color: #9C9075;
+    border: 1px solid #4A4028; border-radius: 5px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; padding: 3px 9px; cursor: pointer; }
+  .copy-btn:hover, .copy-btn:focus-visible { color: var(--code-accent); border-color: var(--code-accent); outline: none; }
+  code { font-family: 'IBM Plex Mono', monospace; font-size: .88em; background: var(--surface-2);
+    border-radius: 4px; padding: 1px 5px; }
+  .code code { background: none; padding: 0; }
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; margin: 12px 0; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th { text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted); padding: 9px 13px; border-bottom: 1px solid var(--line);
+    background: var(--surface-2); white-space: nowrap; }
+  td { padding: 8px 13px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  .callout { border: 1px solid var(--line); border-left: 4px solid var(--accent); background: var(--surface);
+    border-radius: 6px; padding: 13px 17px; margin: 14px 0; }
+  .callout.danger { border-left-color: var(--danger); background: var(--danger-bg); }
+  .callout.danger .co-label { color: var(--danger); }
+  .co-label { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 4px; }
+  .callout p { margin: 4px 0; }
+  ul, ol { padding-left: 1.3em; margin: 8px 0; }
+  li { margin: 5px 0; }
+  li::marker { color: var(--accent); }
+  .term { display: grid; grid-template-columns: 96px 1fr; gap: 14px; margin-top: 18px; }
+  .term-tag { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px;
+    color: var(--accent); border-top: 2px solid var(--accent); padding-top: 6px; }
+  .term-body { border-top: 2px solid var(--line); padding-top: 6px; min-width: 0; }
+  .term-body .t { font-weight: 700; font-size: 15px; }
+  footer { margin-top: 68px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+  @media (max-width: 560px) { h1 { font-size: 30px; } .term { grid-template-columns: 64px 1fr; gap: 10px; } }
+</style>
+
+<div class="wrap">
+<header class="masthead">
+  <span class="eyebrow">g1_api · 操作者视角 · 网段 192.168.220.x</span>
+  <h1>G1 快速上手</h1>
+  <p class="lede">从零到机器人跑起来的最短路径：五个终端、一套脚本、网页操作。配套的深度参考（Day-1 剧本、互锁对照、分层上电）在《G1 上机手册》，本页管"今天怎么开机干活"。</p>
+</header>
+
+<section>
+  <h2><span class="no">01</span>跑起来：五个终端</h2>
+  <p class="h2-sub">前提：机器人已开机 → 站立 → <b>走跑模式</b>（遥控器按官方手册操作），急停遥控专人在手。代码有更新先同步：</p>
+  <div class="code"><pre><span class="cm"># 笔记本上：整目录同步（改了任何代码后的标准动作，传完重启 g1_api）</span>
+scp -r /home/g1/workspace/project/concierge/G1/st_ws/g1_api unitree@192.168.220.8:/home/unitree/abotclaw_nv/</pre></div>
+
+  <div class="term"><div class="term-tag">终端①</div><div class="term-body">
+    <span class="t">容器 + roscore（长驻 master）</span>
+    <p class="me-hint" style="opacity:.85">登录后不再弹 ROS 版本菜单——机器人 ~/.bashrc 已改为自动选 noetic（要 foxy：export ROS_CHOOSE=1；原文件备份在 ~/.bashrc.bak_roschoose）。</p>
+    <div class="code"><pre>sshpass -p 123 ssh unitree@192.168.220.8
+docker run -it --rm --name AbotClaw --network=host --privileged \
+    -e "TERM=xterm-256color" \
+    -v /home/unitree/abotclaw_nv:/home/unitree/abotclaw_nv abotclaw_g1_final bash
+source /home/unitree/abotclaw_nv/g1_api/deploy/robot_env.sh &amp;&amp; roscore</pre></div>
+  </div></div>
+
+  <div class="term"><div class="term-tag">终端②</div><div class="term-body">
+    <span class="t">速度桥（/cmd_vel → 机器人腿）</span>
+    <div class="code"><pre>sshpass -p 123 ssh unitree@192.168.220.8
+docker exec -it AbotClaw bash
+source /home/unitree/abotclaw_nv/g1_api/deploy/robot_velbridge.sh</pre></div>
+    <p>⚠️ 它一活，任何 /cmd_vel 速度都会让机器人真走——确认场地清空、急停在手再起。</p>
+  </div></div>
+
+  <div class="term"><div class="term-tag">终端③</div><div class="term-body">
+    <span class="t">外部动作执行器（回放；不用外部动作可跳过）</span>
+    <div class="code"><pre>sshpass -p 123 ssh unitree@192.168.220.8
+docker exec -it AbotClaw bash
+source /home/unitree/abotclaw_nv/g1_api/deploy/robot_extexec.sh</pre></div>
+    <p>⚠️ 机器人<b>站立后</b>再启动；它执行的回放会真动双臂。没起它时外部动作接口 409 提示，其余功能不受影响。</p>
+  </div></div>
+
+  <div class="term"><div class="term-tag">终端④</div><div class="term-body">
+    <span class="t">g1_api 服务</span>
+    <div class="code"><pre>sshpass -p 123 ssh unitree@192.168.220.8
+docker exec -it AbotClaw bash
+source /home/unitree/abotclaw_nv/g1_api/deploy/robot_g1api.sh</pre></div>
+    <p>脚本内含全部配置与日常安全开关（除不避障遥控 <code>ALLOW_MOTION</code> 外全开）。<b>首次部署</b>请先把脚本里的开关块注释掉，按上机手册分层打开。</p>
+  </div></div>
+
+  <div class="term"><div class="term-tag">终端⑤</div><div class="term-body">
+    <span class="t">笔记本 RViz（观察，可选）</span>
+    <div class="code"><pre>/home/g1/workspace/project/concierge/G1/st_ws/g1_api/deploy/laptop_rviz.sh mapping   <span class="cm"># 建图视角</span>
+/home/g1/workspace/project/concierge/G1/st_ws/g1_api/deploy/laptop_rviz.sh nav       <span class="cm"># 导航视角</span></pre></div>
+  </div></div>
+
+  <h3>就绪确认</h3>
+  <div class="code"><pre>curl -s http://192.168.220.8:1448/api/core/system/v1/robot/health
+<span class="cm"># interlocks 预期只剩 map_not_selected / localization_not_initialized（还没选图，正常）</span></pre></div>
+  <p>网页入口：<b>http://192.168.220.8:1448/sdk</b>（调试台）· <b>/sdk/map-editor</b>（地图编辑器）。需要灵巧手再补一窗格：source robot_env.sh 后跑 <code>hardware/scripts/start_hand_server.sh</code>。</p>
+</section>
+
+<section>
+  <h2><span class="no">02</span>标准作业流</h2>
+  <h3>A. 新场地：SDK 建图（网页「建图录制」组可点着走）</h3>
+  <div class="code"><pre>curl -X POST http://192.168.220.8:1448/api/core/slam/v1/mapping/:start   <span class="cm"># 停导航栈→起建图栈</span>
+<span class="cm"># 遥控器慢走全场：&lt;0.5 m/s、缓转弯、玻璃镜面不久留、最后走回起点收回环；起点贴地标！</span>
+curl -X POST http://192.168.220.8:1448/api/core/slam/v1/mapping/:finish \
+     -H 'Content-Type: application/json' -d '{"map_id":"changdi-1f","name":"场地一层"}'
+<span class="cm"># 自动：存2D栅格→停栈存点云→打包 .g1map 入库；放弃用 /mapping/:cancel</span></pre></div>
+
+  <h3>B. 日常：选图 → 重定位 → 干活</h3>
+  <div class="code"><pre>curl -X POST http://192.168.220.8:1448/api/core/slam/v1/maps/<span class="hl">changdi-1f</span>/:select   <span class="cm"># =启动导航栈</span>
+<span class="cm"># 把机器人摆到地标（建图起点=地图原点），朝向对齐：</span>
+curl -X POST http://192.168.220.8:1448/api/core/slam/v1/localization/:relocalize \
+     -H 'Content-Type: application/json' -d '{"x":0,"y":0,"yaw":0}'
+curl -s http://192.168.220.8:1448/api/core/slam/v1/localization/pose   <span class="cm"># 核对读数</span></pre></div>
+  <p>重定位不需要任何安全开关（机器人不动）；但 <b>:select 必须先做</b>——重定位服务是导航 launch 带起来的。</p>
+
+  <h3>C. 导航与导览</h3>
+  <div class="code"><pre><span class="cm"># 导航到点（异步：提交→轮询；坐标采集最准的办法=遥控到位读 pose）</span>
+curl -X POST http://192.168.220.8:1448/api/core/motion/v1/actions -H 'Content-Type: application/json' \
+     -d '{"action_name":"g1.actions.MoveToAction","options":{"target":{"x":1.0,"y":0.5},"yaw":0,"with_yaw":true}}'
+curl http://192.168.220.8:1448/api/core/motion/v1/actions/:current    <span class="cm"># 404="空闲"是正常语义</span>
+curl -X DELETE http://192.168.220.8:1448/api/core/motion/v1/actions/:current   <span class="cm"># 取消</span>
+
+<span class="cm"># 导览（航迹点在地图编辑器里点选配置，随地图保存）</span>
+curl -X POST http://192.168.220.8:1448/api/tour/v1/tours/:start
+curl http://192.168.220.8:1448/api/tour/v1/tours/:current
+curl -X POST http://192.168.220.8:1448/api/tour/v1/tours/:stop</pre></div>
+
+  <h3>C+. 外部动作：回放库（像官方动作一样用）</h3>
+  <div class="code"><pre><span class="cm"># 上传录好的双臂轨迹 .npy 入库（frequency 必须=录制频率；query 只能 ASCII）</span>
+curl -X POST "http://192.168.220.8:1448/api/core/motion/v1/external-actions?name=<span class="hl">pick-cube</span>&amp;frequency=30&amp;velocity_limit=20" \
+     --data-binary @real_pick_cube_ep0010.npy -H 'Content-Type: application/octet-stream'
+
+<span class="cm"># 列表 / 按 id 执行（同步：响应返回=回放结束）/ 删除</span>
+curl http://192.168.220.8:1448/api/core/motion/v1/external-actions
+curl -X POST http://192.168.220.8:1448/api/core/motion/v1/external-actions/<span class="hl">pick-cube</span>/:execute</pre></div>
+  <p>前提：终端③执行器在跑。执行期挂 <code>external_motion_running</code> 互锁：官方手臂动作/导航/导览启动都 409，结束自动释放——不会和运控打架（回放走 rt/arm_sdk，腿仍归运控）。首次执行手臂会先移动到轨迹起始位姿，确认周围无人；新轨迹先用小 <code>velocity_limit</code>（如 5）试柔和度。详见上机手册 10 节。</p>
+
+  <h3>D. 地图编辑器（/sdk/map-editor）</h3>
+  <ul>
+    <li><b>绘制模式</b>：障碍笔画虚拟墙/禁行区、自由笔擦玻璃虚影，1.2s 自动同名保存；只影响规划，不影响定位。</li>
+    <li><b>航迹点模式</b>：点击加点、拖动移动；面板配置朝向、TTS、停留、<b>两个容差</b>（到点 reach / 朝向 yaw）、动作序列（机载=手臂/灵巧手；外部=回放库，写 <code>{"executor":"external","type":"replay","id":"pick-cube"}</code>，执行器没起时导览记日志跳过）。</li>
+    <li><b>保存并应用</b>：改完一键 重存→重新:select→原位重定位（定位不丢）。</li>
+  </ul>
+
+  <h3>E. 收工</h3>
+  <ul>
+    <li>导览在跑先 <code>:stop</code>；依次 Ctrl-C ④③②①（api→执行器→速度桥→roscore）；遥控切阻尼→按官方手册关机。</li>
+    <li>当天录/改过地图：下载备份 <code>curl -O -J http://192.168.220.8:1448/api/core/slam/v1/maps/{id}/package</code>。</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="no">03</span>注意事项</h2>
+  <div class="callout danger"><span class="co-label">安全红线</span>
+  <p>① <code>ALLOW_MOTION</code>（不避障速度遥控）只在有人持急停在场时临时开；② 导航前必须处于走跑模式；③ 首次部署不要直接用日常开关组合，按手册分层上电；④ 急停类停止命令永远放行，任何开关都拦不住它——这是设计。</p></div>
+  <ul>
+    <li><b>两张网别搞混</b>：<code>192.168.220.8</code> 是对外网（ssh/网页/RViz）；eth0 上的 <code>192.168.123.x</code> 是机器人内网（DDS/雷达），<code>G1_API_MODE_NETWORK_INTERFACE=eth0</code> 和 MID360 配置永远不动。</li>
+    <li><b>运动指令单一来源</b>：API 动作执行中别再用 RViz 点 2D Nav Goal（同一个 /move_base_simple/goal，会互相打断且状态机不知情）；RViz 只做观察。</li>
+    <li><b>不要手动 roslaunch 导航/建图栈</b>：生命周期归 g1_api（:select / :start / :finish），手动起会两套 FAST-LIO 抢雷达。手动 roslaunch 只留作 g1_api 故障时的兜底调试。</li>
+    <li><b>代码同步后要重启</b> g1_api；改了栅格或 TEB 参数要重新 <code>:select</code> 才加载。</li>
+    <li><b>容差不变量</b>：TEB 的 <code>xy_goal_tolerance</code>(0.2) 必须 ≤ 每点的 reach_threshold——反了会"TEB 说到了、g1_api 说没到"死锁到超时（实测教训）。</li>
+    <li><b>手臂动作站定做</b>；动作后自动复位(99)+3s 沉降是内置行为。转向注意物理限位 ±1.3 rad，导览点朝向容差建议 ≥0.5。</li>
+    <li><b>动作表以真机为准</b>：<code>GET /arm/v1/action-list</code> 现场返回的才是权威（SDK 快照可能滞后，31 号存疑）。</li>
+    <li><b>TTS</b>：<code>speaker_id</code> 0=中文 / 1=英文（以固件实测为准）；<b>LED</b> 会被本体状态盖掉，用 <code>hold_s</code> 保持。</li>
+    <li><b>安全开关改完必须重启服务</b>（启动时读取）；409 时看响应里的互锁名与解法。</li>
+    <li><b>地图库已持久化</b>到挂载卷（robot_g1api.sh 内置）——但换机器/重装前仍先下载 .g1map 备份。</li>
+  </ul>
+</section>
+
+<section>
+  <h2><span class="no">04</span>速查表</h2>
+  <h3>手臂动作（内置表；现场以 action-list 为准）</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th>id</th><th>动作</th><th>id</th><th>动作</th></tr>
+    <tr><td><b>99</b></td><td><b>复位</b>（每次动作后自动执行）</td><td>20/21</td><td>比心 / 右手比心</td></tr>
+    <tr><td>11/12/13</td><td>双手/左/右 飞吻</td><td>22</td><td>拒绝（摆手）</td></tr>
+    <tr><td>15</td><td>双手举起</td><td>23</td><td>右手举起</td></tr>
+    <tr><td>17 / 18</td><td>鼓掌 / 击掌</td><td>24 / 25</td><td>X-ray / 面前挥手</td></tr>
+    <tr><td>19</td><td>拥抱</td><td><b>26</b> / 27</td><td><b>高位挥手</b> / 握手</td></tr>
+  </table></div>
+  <h3>灵巧手命令（TCP，POST /hand/v1/command）</h3>
+  <p><code>1-6</code> 左手、<code>7-12</code> 右手、<code>13-19</code> 双手（顺序：张开/握拳/半握/捏合/握瓶/剪刀手…）、<code>s</code> 查状态。</p>
+  <h3>动作状态机（思岚语义）</h3>
+  <p><code>status: 0 NewBorn → 1 Working → 4 Done</code>；终态看 <code>result</code>（0 成功 / −1 失败 / −2 被取消）；空闲查 :current 返回 <b>404 是正常</b>；单槽位，忙时提交 400 ROBOT_BUSY。</p>
+  <h3>容差三层速记</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th>层</th><th>在哪调</th><th>默认</th></tr>
+    <tr><td>TEB 终点容差</td><td>launch 参数（改后重新 :select）</td><td>xy 0.2 / yaw 0.3（课程值）</td></tr>
+    <tr><td>到点容差 reach_threshold</td><td>每次请求 或 编辑器每点</td><td>0.25 m（≥ TEB 容差）</td></tr>
+    <tr><td>朝向容差 yaw_threshold</td><td>每次请求 或 编辑器每点</td><td>0.25 rad</td></tr>
+  </table></div>
+
+  <h3>planner 切换（可选：AeroMaze 源码栈）</h3>
+  <div class="code"><pre><span class="cm"># aero 已是 robot_g1api.sh 的默认 planner（前提：overlay 编译过一次，手册 09 节）</span>
+source /home/unitree/abotclaw_nv/g1_api/deploy/robot_g1api.sh
+<span class="cm"># 要临时回课程栈：</span>
+export G1_API_PLANNER=course && source /home/unitree/abotclaw_nv/g1_api/deploy/robot_g1api.sh</pre></div>
+  <p>aero 模式下到点判定直接信 planner 的 <code>/move_base/result</code>（成功=到点、中止=失败带原因），TEB 容差 xy 0.25 / yaw 0.25（试验值），上表的"≥ TEB"不变量不再适用。仿真对应 <code>g1sim-up --aero</code>。</p>
+</section>
+
+<footer>
+  <p>深度参考：《G1 上机手册》（Day-1 剧本 / 分层上电 / 互锁对照 / 远程 RViz / DDS 并行）——仓库镜像 <code>g1_api/docs/deploy_handbook.html</code>。本页镜像 <code>g1_api/docs/quickstart.html</code>。API 全集见 <code>docs/API.md</code> 或 /sdk 调试台。</p>
+</footer>
+</div>
+
+<script>
+  document.querySelectorAll('.code').forEach(function (block) {
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '复制';
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText(block.querySelector('pre').innerText).then(function () {
+        btn.textContent = '已复制';
+        setTimeout(function () { btn.textContent = '复制'; }, 1500);
+      });
+    });
+    block.appendChild(btn);
+  });
+</script>

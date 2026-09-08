@@ -1,0 +1,31 @@
+# ---- catkin / CMake 构建产物（真机上重编即得，且是 ARM64，x86 产物没用）----
+build/
+devel/
+*.egg-info/
+
+# ---- CycloneDDS 编译产物（83M；CYCLONEDDS_HOME 指向它，每台机器自己编）----
+unitree_sdk2_python/cyclonedds/install/
+unitree_sdk2_python/cyclonedds/python_build/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# ---- 运行时产物 ----
+logs/
+g1_api/.test_maps/
+from_robot/
+
+# ---- 大二进制（可重新下载/生成）----
+hardware/linkhand/dashboard
+navigate/map/map.pcd
+navigate/map/ground_map.pcd
+
+# ---- rosbag：默认不传，但保留 HANDOFF §6 定位滑移那份证据 ----
+*.bag
+!bags/debug_0831_103851.bag
+
+.DS_Store

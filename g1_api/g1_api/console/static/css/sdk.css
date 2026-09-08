@@ -1,0 +1,143 @@
+:root {
+  --bg: #0f1420;
+  --panel: #171e2e;
+  --panel-alt: #1c2538;
+  --border: #273350;
+  --text: #e6ebf5;
+  --muted: #8b96ad;
+  --accent: #4f9cff;
+  --ok: #34c07c;
+  --warn: #f0a03c;
+  --danger: #f0556e;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: #121a2b;
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+.topbar h1 { font-size: 17px; margin: 0; }
+.topbar-meta { display: flex; gap: 12px; align-items: center; }
+
+.app { max-width: 960px; margin: 0 auto; padding: 20px 16px 80px; }
+.loading { color: var(--muted); }
+
+.group { margin-bottom: 18px; }
+.group-head {
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 12px;
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.ep { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; background: var(--panel); overflow: hidden; }
+.ep-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.ep-head:hover { background: var(--panel-alt); }
+.ep-head .method { font-family: var(--mono); font-weight: 700; min-width: 52px; }
+.method.GET { color: var(--ok); }
+.method.POST { color: var(--accent); }
+.method.PUT { color: var(--warn); }
+.method.DELETE { color: var(--danger); }
+.ep-head .path { font-family: var(--mono); flex: 1; }
+.ep-head .title { color: var(--muted); }
+.ep-head .caret { color: var(--muted); transition: transform .15s; }
+.ep.open .caret { transform: rotate(90deg); }
+
+.badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.badge.SAFE_READ { background: #123524; color: var(--ok); }
+.badge.ACTION { background: #2b2a14; color: var(--warn); }
+.badge.SAFETY_CRITICAL { background: #3a1620; color: var(--danger); }
+.badge.mock { background: #2b2a14; color: var(--warn); }
+.badge.real { background: #3a1620; color: var(--danger); }
+
+.ep-body { border-top: 1px solid var(--border); padding: 12px; }
+.ep-body h4 { margin: 14px 0 6px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.ep-body h4:first-child { margin-top: 0; }
+.desc { margin: 0 0 4px; }
+
+table.params { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.params th, table.params td { border: 1px solid var(--border); padding: 5px 8px; text-align: left; vertical-align: top; }
+table.params th { background: var(--panel-alt); color: var(--muted); }
+table.params td.mono { font-family: var(--mono); }
+
+textarea.sample {
+  width: 100%;
+  min-height: 90px;
+  background: #0d1424;
+  color: #d6e4ff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 8px;
+  resize: vertical;
+}
+
+.row { display: flex; gap: 8px; margin: 8px 0; align-items: center; flex-wrap: wrap; }
+button {
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 6px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+button.secondary { background: transparent; border: 1px solid var(--border); color: var(--text); }
+button:hover { filter: brightness(1.1); }
+
+.resp { margin-top: 10px; }
+.resp .status { font-family: var(--mono); font-weight: 700; }
+.resp .status.ok { color: var(--ok); }
+.resp .status.err { color: var(--danger); }
+pre.output {
+  background: #0d1424;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: #cfe1ff;
+  margin: 6px 0 0;
+}
+.interlocks { background: #3a1620; border: 1px solid #5b2030; border-radius: 6px; padding: 8px 10px; margin: 8px 0; }
+.interlocks li { margin: 2px 0; }
+
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.poll-line { font-family: var(--mono); color: var(--muted); font-size: 12.5px; }

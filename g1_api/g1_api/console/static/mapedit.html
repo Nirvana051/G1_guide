@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>g1_api 地图编辑器</title>
+  <link rel="stylesheet" href="/sdk/static/css/sdk.css">
+  <style>
+    .me-layout { display: flex; gap: 12px; align-items: stretch; height: calc(100vh - 120px); min-height: 480px; }
+    .me-canvas-wrap { flex: 1 1 auto; overflow: auto; background: #1a1f24; border: 1px solid #2c343c; border-radius: 8px; position: relative; }
+    .me-stage { position: relative; transform-origin: 0 0; }
+    .me-stage canvas { display: block; image-rendering: pixelated; position: absolute; left: 0; top: 0; }
+    .me-stage canvas:first-child { position: static; }
+    .me-panel { flex: 0 0 320px; overflow-y: auto; border: 1px solid #2c343c; border-radius: 8px; padding: 12px; font-size: 13px; }
+    .me-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .me-toolbar .sep { width: 1px; height: 22px; background: #2c343c; }
+    .me-toolbar button, .me-toolbar select { padding: 4px 10px; }
+    .me-toolbar button.active { outline: 2px solid #4ea; }
+    .me-status { margin-left: auto; font-size: 12px; opacity: .8; }
+    .me-point-row { border: 1px solid #2c343c; border-radius: 6px; padding: 6px 8px; margin: 6px 0; cursor: pointer; }
+    .me-point-row.selected { outline: 2px solid #4ea; }
+    .me-form label { display: block; margin-top: 8px; font-size: 12px; opacity: .85; }
+    .me-form input, .me-form select, .me-form textarea { width: 100%; box-sizing: border-box; padding: 4px 6px; }
+    .me-action-row { border: 1px dashed #3a444e; border-radius: 6px; padding: 6px; margin-top: 6px; display: grid; gap: 4px; }
+    .me-action-row .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+    .me-hint { font-size: 12px; opacity: .7; margin: 6px 0; line-height: 1.5; }
+    .me-btn-danger { color: #f88; }
+  </style>
+</head>
+<body>
+<header class="page-head">
+  <h1>地图编辑器 <span style="font-size:13px;opacity:.7">画障碍/擦除 · 航迹点 · 同名保存回地图库</span></h1>
+  <nav><a href="/sdk">← 返回 SDK 调试台</a></nav>
+</header>
+
+<div class="me-toolbar">
+  <label>地图 <select id="mapSel"></select></label>
+  <span class="sep"></span>
+  <button id="modeDraw" class="active">✏ 绘制</button>
+  <button id="modePoints">📍 航迹点</button>
+  <span class="sep"></span>
+  <span id="drawTools">
+    <button id="penObstacle" class="active" title="画障碍（黑）">■ 障碍</button>
+    <button id="penFree" title="擦除为自由区（白）">□ 自由</button>
+    <button id="penUnknown" title="涂为未知（灰）">▨ 未知</button>
+    <select id="penSize"><option value="1">细 1</option><option value="2" selected>中 2</option><option value="4">粗 4</option><option value="8">特粗 8</option></select>
+    <button id="undoBtn" title="撤销上一笔">↶ 撤销</button>
+  </span>
+  <span class="sep"></span>
+  <button id="zoomOut">−</button><span id="zoomLabel">400%</span><button id="zoomIn">＋</button>
+  <span class="sep"></span>
+  <button id="applyBtn" title="保存后重新 :select 让导航栈加载新图；若正在此图上定位，保持定位不丢">保存并应用到导航栈</button>
+  <span class="me-status" id="status">加载中…</span>
+</div>
+
+<div class="me-layout">
+  <div class="me-canvas-wrap" id="canvasWrap">
+    <div class="me-stage" id="stage">
+      <canvas id="gridCanvas"></canvas>
+      <canvas id="overlayCanvas"></canvas>
+    </div>
+  </div>
+  <div class="me-panel">
+    <div id="pointsPanel">
+      <b>航迹点</b>
+      <p class="me-hint">「航迹点」模式下：点击地图空白处新增；点击点选中；拖动移动。改动 1.2s 后自动保存进该地图的 manifest（同名覆盖）。</p>
+      <div id="pointList"></div>
+      <div id="pointForm" class="me-form" style="display:none">
+        <hr>
+        <label>名称 <input id="fName"></label>
+        <label>x (m) <input id="fX" type="number" step="0.05"></label>
+        <label>y (m) <input id="fY" type="number" step="0.05"></label>
+        <label>朝向 yaw (rad, CCW) <input id="fYaw" type="number" step="0.1" min="-3.1416" max="3.1416"></label>
+        <label>到点容差 reach_threshold (m)——粗到点判定半径，过道宽可放 0.3，默认 0.2，别小于 TEB 的 0.2
+          <input id="fReach" type="number" step="0.05" min="0.15" max="1"></label>
+        <label>朝向容差 yaw_threshold (rad)——转向对准的允许误差，默认 0.15（≈8.6°），不挑朝向的点可放 0.5
+          <input id="fYawTol" type="number" step="0.05" min="0.05" max="3.14"></label>
+        <label>到点播报 TTS <textarea id="fTts" rows="2"></textarea></label>
+        <label>讲话时长 tts_duration_s (s)——0=自动按字数估算（中英分系数）；估不准时手动指定实际播报秒数
+          <input id="fTtsDur" type="number" step="0.5" min="0"></label>
+        <label>停留 dwell (s) <input id="fDwell" type="number" step="0.5" min="0"></label>
+        <b style="display:block;margin-top:10px">动作序列</b>
+        <p class="me-hint">执行器：<b>机载</b> = 现有管线（手臂/灵巧手）；<b>外部</b> = 自定义动作执行器（未配置时导览中记日志跳过，接口已预留）。</p>
+        <div id="actionRows"></div>
+        <button id="addAction">＋ 添加动作</button>
+        <hr>
+        <button id="testPointInPlace">▶ 试跑此点（原地：只动作+TTS，不走动）</button>
+        <button id="testPoint">▶ 全流程试跑（走过去+动作+TTS）</button>
+        <button id="delPoint" class="me-btn-danger">删除此点</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/sdk/static/js/mapedit.js"></script>
+</body>
+</html>

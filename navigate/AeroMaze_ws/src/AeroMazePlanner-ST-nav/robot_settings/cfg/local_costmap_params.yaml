@@ -1,0 +1,40 @@
+local_costmap:
+  global_frame: odom
+  robot_base_frame: base_link
+  update_frequency: 20.0
+  publish_frequency: 20.0
+  footprint_padding: 0.0
+  rolling_window: true
+  width: 4.0
+  height: 4.0
+  resolution: 0.03
+  plugins: 
+    - {name: static_layer, type: "costmap_2d::StaticLayer"}
+    - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
+    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+
+  static_layer:
+    enabled: true
+    map_topic: /map
+    use_maximum: true
+
+  obstacle_layer:
+    enabled: true
+    clear_on_update: true
+    observation_sources: scan
+    scan:
+      data_type: LaserScan
+      topic: /scan
+      marking: true
+      clearing: true
+      observation_persistence: 0.0
+      expected_update_rate: 0.0     # 先别设 5.0
+      inf_is_valid: false           # 先关掉试试
+      obstacle_range: 2.5           # 加
+      raytrace_range: 3.0           # 加，且必须 > obstacle_range
+      max_obstacle_height: 5.0
+      min_obstacle_height: 0.0
+      
+  inflation_layer:
+    cost_scaling_factor:  5.0
+    inflation_radius:     0.5

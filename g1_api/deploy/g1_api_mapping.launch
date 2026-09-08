@@ -1,0 +1,14 @@
+<!-- Mapping launch managed by g1_api's POST /mapping/:start (real robot).
+     Course fastlio mapping.launch minus rviz (headless service context).
+     The lidar driver IS included here; on the robot the sensor is real.
+     Ctrl-C / managed stop auto-saves map.pcd + ground_map.pcd to the
+     course-hardcoded /home/unitree/abotclaw_nv/navigate/map/ (see
+     map_builder_node.cpp), which is g1_api's map.mapping_output_dir default.
+-->
+<launch>
+    <include file="$(find livox_ros_driver2)/launch_ROS1/msg_MID360.launch">
+    </include>
+    <rosparam command="load" file="$(find fastlio)/config/mapping.yaml" />
+    <node pkg="fastlio" type="map_builder_node" name="map_builder_node" output="screen"/>
+    <include file="$(find fastlio)/launch/octomap_server.launch"/>
+</launch>

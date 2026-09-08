@@ -1,0 +1,83 @@
+{
+  "map_id": "delta",
+  "name": "delta",
+  "created_utc": 1787461553.844004,
+  "resolution": 0.05,
+  "origin": [
+    -20.25,
+    -38.949999,
+    0.0
+  ],
+  "tour_points": [
+    {
+      "name": "点1",
+      "x": 6.13,
+      "y": -12.97,
+      "yaw": -0.9416,
+      "actions": [
+        {
+          "executor": "onboard",
+          "type": "arm",
+          "id": 25
+        },
+        {
+          "executor": "external",
+          "type": "replay",
+          "id": "left"
+        }
+      ],
+      "tts_text": "Good morning, and welcome to Punggol Digital District.\nI'm G1, your guide today.\nI'll take you through two stops — where we work, where we experiment. Please follow me.",
+      "dwell_s": 0.0,
+      "reach_threshold": 0.35,
+      "yaw_threshold": 0.5,
+      "tts_duration_s": 0.0
+    },
+    {
+      "name": "点2",
+      "x": 1.93,
+      "y": -2.52,
+      "yaw": -0.9416,
+      "actions": [
+        {
+          "executor": "onboard",
+          "type": "arm",
+          "id": 17
+        },
+        {
+          "executor": "external",
+          "type": "replay",
+          "id": "right"
+        }
+      ],
+      "tts_text": "This is our staff zone, the heart of daily operations.\nEngineers, operations, and partners all share this floor — so problems get solved fast.\n",
+      "dwell_s": 0.0,
+      "reach_threshold": 0.35,
+      "yaw_threshold": 0.5,
+      "tts_duration_s": 0.0
+    },
+    {
+      "name": "点3",
+      "x": 0.08,
+      "y": 5.73,
+      "yaw": -1.8416,
+      "actions": [
+        {
+          "executor": "external",
+          "type": "replay",
+          "id": "right"
+        },
+        {
+          "executor": "onboard",
+          "type": "arm",
+          "id": 25
+        }
+      ],
+      "tts_text": "And this is our experimental zone.\nRobotics, automation, smart systems — everything is tested here before it reaches the district.Bye Bye",
+      "dwell_s": 0.0,
+      "reach_threshold": 0.35,
+      "yaw_threshold": 0.5,
+      "tts_duration_s": 0.0
+    }
+  ],
+  "checksums": {}
+}
